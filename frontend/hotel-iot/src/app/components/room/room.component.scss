@@ -1,0 +1,17 @@
+.room-square {
+  width: 100px;
+  height: 100px;
+  background-color: lightgreen;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.menu {
+  position: absolute;
+  background-color: white;
+  border: 1px solid black;
+  padding: 10px;
+  margin-top: 10px;
+}

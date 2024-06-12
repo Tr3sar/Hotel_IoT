@@ -1,0 +1,84 @@
+# Node.js dependencies
+/frontend/node_modules
+/frontend/.npm
+/frontend/hotel-iot/.angular/cache
+
+# Python dependencies
+/venv
+/backend/.venv
+/backend/app/__pycache__
+/backend/__pycache__
+/backend/*.pyc
+backend/app/SmartClient/__pycache__/
+backend/app/SmartRoom/__pycache__/
+
+
+
+# Environment variables
+*.env
+
+# Database files
+/backend/*.db
+
+# Python-specific files
+/backend/.pytest_cache/
+/backend/.mypy_cache/
+/backend/.coverage
+/backend/coverage/
+*.cover
+*.coverage.*
+*.log
+
+# FastAPI
+/backend/logs
+/backend/debug.log
+
+# VS Code
+.vscode/
+.history/
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Other common files
+*.swp
+*.swo
+*.swn
+
+# IDE-specific files
+.idea/
+.project
+.classpath
+c9workspace
+*.launch
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Compiled files
+*.out
+*.o
+*.d
+
+# Coverage reports
+htmlcov/
+.tox/
+
+# Build artifacts
+build/
+dist/
+*.egg-info
+

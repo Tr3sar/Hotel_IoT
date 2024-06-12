@@ -1,0 +1,10 @@
+<div class="room-square" (click)="toggleMenu()">
+  {{ room.number }}
+</div>
+<div *ngIf="menuVisible" class="menu">
+  <label for="status">Select Status:</label>
+  <select id="status" [(ngModel)]="selectedStatus">
+    <option *ngFor="let status of roomStatuses" [value]="status">{{ status }}</option>
+  </select>
+  <button (click)="handleOptionSelected('Set Status')">Set Status</button>
+</div>

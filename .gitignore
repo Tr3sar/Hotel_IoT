@@ -5,12 +5,10 @@
 
 # Python dependencies
 /venv
-/backend/.venv
-/backend/app/__pycache__
-/backend/__pycache__
+**/.venv
+**/venv
 /backend/*.pyc
-backend/app/SmartClient/__pycache__/
-backend/app/SmartRoom/__pycache__/
+**/__pycache__/
 
 
 

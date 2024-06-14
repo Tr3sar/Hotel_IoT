@@ -1,5 +1,5 @@
 import time
-from app.SmartClient.SmartClient import SmartClient
+from backend.app.SmartClient.SmartClient import SmartClient
 
 if __name__ == '__main__':
     client = SmartClient(3, "Josep Martín Torres")

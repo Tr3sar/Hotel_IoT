@@ -1,4 +1,8 @@
-Flask
-flask-cors
-paho-mqtt
+fastapi
+uvicorn
+sqlalchemy
+cryptography
+pymysql
+pydantic
 python-dotenv
+paho-mqtt

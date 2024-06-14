@@ -6,9 +6,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class SmartClient():
-    def __init__(self, client_id, name):
+    def __init__(self, client_id, name, email):
         self.client_id = client_id
         self.name = name
+        self.email = email
         self.rfid_code = None
         self.room_number = None
 

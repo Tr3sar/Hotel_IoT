@@ -18,8 +18,6 @@ class Room(RoomBase):
 class ClientBase(BaseModel):
     name: str
     email: str
-    rfid_code: Optional[int] = None
-    room_number: Optional[int] = None
 
 class ClientCreate(ClientBase):
     pass
@@ -61,6 +59,7 @@ class Reservation(ReservationBase):
 class RoomAssignmentBase(BaseModel):
     client_id: int
     room_id: int
+    rfid_code: int
 
 class RoomAssignmentCreate(RoomAssignmentBase):
     pass
@@ -84,3 +83,24 @@ class Device(DeviceBase):
 
     class Config:
         from_attributes = True
+
+class CheckInRequest(BaseModel):
+    rfid_code: int
+    room_number: int
+
+class AdjustEnvironmentRequest(BaseModel):
+    temperature: int
+    lighting_intensity: int
+
+class CleaningRequest(BaseModel):
+    client_id: int
+
+class ReserveServiceRequest(BaseModel):
+    reservation_type: str
+    time: str
+
+class OrderRestaurantRequest(BaseModel):
+    order_details: str
+
+class UpdateRoomStatusRequest(BaseModel):
+    status: str

@@ -13,6 +13,10 @@ def get_db():
     finally:
         db.close()
 
+def get_storage():
+    from app.main import storage
+    return storage
+
 @router.post("/", response_model=schemas.Room)
 def create_room(room: schemas.RoomCreate, db: Session = Depends(get_db), storage: storage_module.Storage = Depends()):
     db_room = storage.get_room_by_number(db, number=room.number)
@@ -31,3 +35,7 @@ def get_room(room_id: int, storage: storage_module.Storage = Depends()):
 def get_rooms(skip: int = 0, limit: int = 10, storage: storage_module.Storage = Depends()):
     rooms = storage.get_rooms(skip=skip, limit=limit)
     return rooms
+
+@router.put("/{room_number}/status", response_model=schemas.Room)
+def update_room_status(room_number: int, request: schemas.UpdateRoomStatusRequest, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
+    return storage.update_room_status(db=db, room_number=room_number, status=request.status)

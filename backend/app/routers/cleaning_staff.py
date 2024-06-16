@@ -13,6 +13,10 @@ def get_db():
     finally:
         db.close()
 
+def get_storage():
+    from app.main import storage
+    return storage
+
 @router.post("/", response_model=schemas.CleaningStaff)
 def create_cleaning_staff(staff: schemas.CleaningStaffCreate, db: Session = Depends(get_db), storage: storage_module.Storage = Depends()):
     return storage.create_cleaning_staff(db=db, staff=staff)

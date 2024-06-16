@@ -60,11 +60,11 @@ class SmartClient():
         self.room_number = None
         self.notifier.notify_checkout(self.client_id, self.room_number)
 
-    def adjust_environment(self,temperature, lightning_intensity):
+    def adjust_environment(self,temperature, lighting_intensity):
         if not self.room_number:
             raise Exception(f"Client {self.client_id} is not checked in to any room")
-        self.notifier.notify_adjust_environment(self.room_number, temperature, lightning_intensity)
-        print(f"Client {self.name} adjusted environment in room {self.room_number} to temperature {temperature} and lightning intensity {lightning_intensity}")
+        self.notifier.notify_adjust_environment(self.room_number, temperature, lighting_intensity)
+        print(f"Client {self.name} adjusted environment in room {self.room_number} to temperature {temperature} and lighting intensity {lighting_intensity}")
 
     def requestRoomCleaning(self):
         if not self.room_number:

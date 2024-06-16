@@ -13,8 +13,6 @@ class Client(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), index=True)
     email = Column(String(100), unique=True, index=True)
-    rfid_code = Column(Integer, unique=True, nullable=True, default=None)
-    room_number = Column(Integer, ForeignKey("rooms.number"), nullable=True, default=None)
 
 class CleaningStaff(Base):
     __tablename__ = "cleaning_staff"
@@ -36,6 +34,7 @@ class RoomAssignment(Base):
     id = Column(Integer, primary_key=True, index=True)
     client_id = Column(Integer, ForeignKey("clients.id"))
     room_id = Column(Integer, ForeignKey("rooms.id"))
+    rfid_code = Column(Integer, unique=True, nullable=False)
 
 class Device(Base):
     __tablename__ = "devices"

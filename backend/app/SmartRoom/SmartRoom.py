@@ -36,14 +36,14 @@ class SmartRoom():
             self.occupied_by = None
     
     def setRoomStatus(self, status):
-        if status in RoomStatus:
+        if status in [status.value for status in RoomStatus]:
             self.status = status
             print(f"Room {self.number} status set to {status}")
         else:
             print("Invalid room status")
             
     def notifyRoomStatus(self, status):
-        if status in RoomStatus:
+        if status in [status.value for status in RoomStatus]:
             self.status = status
             self.notifier.notify_room_status(self.number, status)
             print(f"Room {self.number} status set to {status}")

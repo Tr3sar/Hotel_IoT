@@ -6,3 +6,4 @@ pymysql
 pydantic
 python-dotenv
 paho-mqtt
+colorlog

@@ -3,6 +3,7 @@ from sqlalchemy.exc import IntegrityError
 from app import models, schemas
 from fastapi import HTTPException
 
+from app.SmartHotel.SmartHotel import SmartHotel
 from app.SmartClient.SmartClient import SmartClient
 from app.SmartRoom.SmartRoom import SmartRoom, RoomStatus
 from app.SmartServices.Restaurant.RestaurantService import RestaurantService
@@ -15,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 class Storage:
     def __init__(self):
+        self.hotel = SmartHotel()
         self.rooms = {}
         self.clients = {}
         self.cleaning_staff = {}
@@ -43,6 +45,10 @@ class Storage:
             #self.room_assignments[assignment.id] = assignment
             room_number = self.rooms[assignment.room_id].number
             self.clients[assignment.client_id].checkin(assignment.rfid_code, room_number)
+
+    #Hotel
+    def notify_event(self, event_info: str):
+        self.hotel.notify_event(event_info)
 
     #Room
     def get_room(self, room_id: int):

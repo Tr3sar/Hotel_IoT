@@ -104,3 +104,6 @@ class OrderRestaurantRequest(BaseModel):
 
 class UpdateRoomStatusRequest(BaseModel):
     status: str
+
+class EventNotification(BaseModel):
+    info: str

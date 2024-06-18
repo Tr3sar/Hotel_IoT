@@ -24,7 +24,7 @@ class SmartHotelNotifier:
     def on_disconnect(self, client, userdata, rc, properties=None):
         print(f"Hotel Notifier: Disconnected from broker with result code {rc}")
     
-    def on_publish(self, client, userdata, mid, properties=None):
+    def on_publish(self, client, userdata, mid, rc,  properties=None):
         print(f"Message published with ID: {mid}")
 
     def notify_event(self, event):

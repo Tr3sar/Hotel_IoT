@@ -5,8 +5,8 @@ from fastapi import HTTPException
 
 from app.SmartClient.SmartClient import SmartClient
 from app.SmartRoom.SmartRoom import SmartRoom, RoomStatus
-from app.SmartServices.Restaurant import RestaurantService
-from app.SmartServices.Spa import SpaService
+from app.SmartServices.Restaurant.RestaurantService import RestaurantService
+from app.SmartServices.Spa.SpaService import SpaService
 from app.Staff.CleaningStaff import CleaningStaff
 
 import logging
@@ -36,10 +36,7 @@ class Storage:
 
         reservations = db.query(models.Reservation).all()
         for reservation in reservations:
-            if reservation.reservation_type == "restaurant":
-                self.reservations[reservation.id] = RestaurantService(reservation.id, reservation.client_id, reservation.time)
-            elif reservation.reservation_type == "spa":
-                self.reservations[reservation.id] = SpaService(reservation.id, reservation.client_id, reservation.time)
+            self.clients[reservation.client_id].make_reservation(reservation.id, reservation.reservation_type, reservation.start_date)
 
         room_assignments = db.query(models.RoomAssignment).all()
         for assignment in room_assignments:
@@ -202,10 +199,7 @@ class Storage:
         return {'message': 'Cleaning requested successfully'}
 
         #To implement
-    def reserve_service(self, db: Session, client_id: int, reservation: schemas.ReservationCreate):
-        reservation.client_id = client_id
-        return self.create_reservation(db=db, reservation=reservation)
-
+    
     def order_restaurant(self, client_id: int, order_details: str):
         client = self.get_client(client_id)
         if not client:
@@ -226,16 +220,33 @@ class Storage:
         return db_staff
 
     #Reservation
-    def get_reservations(self, skip: int = 0, limit: int = 10):
-        return list(self.reservations.values())[skip:skip + limit]
+    def get_reservations(self, db: Session, skip: int = 0, limit: int = 10):
+        return db.query(models.Reservation).offset(skip).limit(limit).all()
+
+    def get_reservation(self, db: Session, reservation_id: int):
+        return db.query(models.Reservation).filter(models.Reservation.id == reservation_id).first()
 
     def create_reservation(self, db: Session, reservation: schemas.ReservationCreate):
-        db_reservation = models.Reservation(client_id=reservation.client_id, reservation_type=reservation.reservation_type, time=reservation.time)
-        db.add(db_reservation)
-        db.commit()
-        db.refresh(db_reservation)
-        self.reservations[db_reservation.id] = db_reservation
-        return db_reservation
+        logger.info(f"Creating reservation for client {reservation.client_id}, type {reservation.reservation_type} at {reservation.start_date}")
+        try:
+            db_reservation = models.Reservation(client_id=reservation.client_id, reservation_type=reservation.reservation_type, start_date=reservation.start_date)
+            db.add(db_reservation)
+            db.commit()
+            db.refresh(db_reservation)
+            self.reservations[db_reservation.id] = db_reservation
+            return db_reservation
+        except IntegrityError as e:
+            db.rollback()
+            if "unique_client_time" in str(e.orig):
+                raise HTTPException(
+                    status_code=400,
+                    detail="A reservation for this client already exists at the specified start date."
+                )
+            else:
+                raise HTTPException(
+                    status_code=500,
+                    detail="An unexpected error occurred."
+                )
 
     #Room assignment
     #(Change to check-in, check-out)   ?????

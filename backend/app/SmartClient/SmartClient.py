@@ -73,8 +73,8 @@ class SmartClient():
         print(f"Client {self.name} requested cleaning for room {self.room_number}")
 
     #TODO: Implementar estos mètodes
-    def reserve_service(self, service):
-        print(f"Client {self.name} reserved the service {service.name}")
+    def make_reservation(self, reservation_id, reservation_type, start_Date):
+        print(f"Client {self.name} made a reservation with id {reservation_id} of type {reservation_type} starting on {start_Date}")
 
     def authenticate_rfid(self, rfid_code):
         if self.rfid_code == rfid_code:

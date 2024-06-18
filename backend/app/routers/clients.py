@@ -43,11 +43,6 @@ def adjust_environment(client_id: int, request: schemas.AdjustEnvironmentRequest
 def request_cleaning(client_id: int, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
     return storage.request_cleaning(db=db, client_id=client_id)
 
-@router.post("/{client_id}/reserve_service")
-def reserve_service(client_id: int, request: schemas.ReserveServiceRequest, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
-    reservation = schemas.ReservationCreate(client_id=client_id, reservation_type=request.reservation_type, time=request.time)
-    return storage.reserve_service(db=db, client_id=client_id, reservation=reservation)
-
 @router.post("/{client_id}/order_restaurant")
 def order_restaurant(client_id: int, request: schemas.OrderRestaurantRequest, storage: storage_module.Storage = Depends(get_storage)):
     return storage.order_restaurant(client_id=client_id, order_details=request.order_details)

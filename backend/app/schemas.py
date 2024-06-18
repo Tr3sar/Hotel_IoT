@@ -73,7 +73,7 @@ class RoomAssignment(RoomAssignmentBase):
 class DeviceBase(BaseModel):
     room_id: int
     type: str
-    status: str
+    value: int
 
 class DeviceCreate(DeviceBase):
     pass

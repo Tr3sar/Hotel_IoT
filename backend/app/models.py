@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, UniqueConstraint
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, UniqueConstraint, event
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -41,8 +41,24 @@ class Device(Base):
     id = Column(Integer, primary_key=True, index=True)
     room_id = Column(Integer, ForeignKey("rooms.id"))
     type = Column(String(50))
-    status = Column(String(50), default="off")
+    value = Column(Integer)
     room = relationship("Room", back_populates="devices")
+
+    def __init__(self, **kwargs):
+        super(Device, self).__init__(**kwargs)
+        if self.type == "AC":
+            self.value = 22
+        elif self.type == "Light":
+            self.value = 100
 
 Room.devices = relationship("Device", order_by=Device.id, back_populates="room")
 Client.reservations = relationship("Reservation", order_by=Reservation.id, back_populates="client")
+
+"""
+@event.listens_for(Device, 'init')
+def receive_init(target, args, kwargs):
+    if target.type == "AC":
+        target.value = 22
+    elif target.type == "Light":
+        target.value = 100
+"""

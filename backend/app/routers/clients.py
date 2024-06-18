@@ -34,11 +34,11 @@ def check_in(client_id: int, request: schemas.CheckInRequest, db: Session = Depe
 @router.put("/{client_id}/check_out")
 def check_out(client_id: int, request: schemas.CheckInRequest, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
     return storage.check_out(db=db, client_id=client_id, rfid_code=request.rfid_code, room_number=request.room_number)
-
+"""
 @router.put("/{client_id}/adjust_environment")
 def adjust_environment(client_id: int, request: schemas.AdjustEnvironmentRequest, storage: storage_module.Storage = Depends(get_storage)):
     return storage.adjust_environment(client_id=client_id, temperature=request.temperature, lighting_intensity=request.lighting_intensity)
-
+"""
 @router.put("/{client_id}/request_cleaning")
 def request_cleaning(client_id: int, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
     return storage.request_cleaning(db=db, client_id=client_id)

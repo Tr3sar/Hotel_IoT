@@ -85,6 +85,38 @@ class Storage:
             self.rooms[db_room.id].notifyRoomStatus(status)
 
         return db_room
+    
+    def adjust_environment(self, db: Session, client_id: int, temperature: int, lighting_intensity: int):
+        smart_client = self.get_client(client_id)
+        if not smart_client:
+            raise ValueError("Client not found")
+        elif smart_client.getRoom() is None:
+            raise ValueError("Client is not checked in")
+        
+        db_room = db.query(models.Room).filter(models.Room.number == smart_client.getRoom()).first()
+        if not db_room or db_room.id not in self.rooms:
+            raise HTTPException(status_code=404, detail="Room not found")
+
+        ac_device = db.query(models.Device).filter_by(room_id=db_room.id, type="AC").first()
+        bulb = db.query(models.Device).filter_by(room_id=db_room.id, type="Bulb").first()
+
+        if not ac_device:
+            raise HTTPException(status_code=404, detail="AC Device not found")
+
+        if not bulb:
+            raise HTTPException(status_code=404, detail="Light Device not found")
+
+        ac_device.value = temperature
+        bulb.value = lighting_intensity
+
+        db.commit()
+        db.refresh(ac_device)
+        db.refresh(bulb)
+
+        smart_client.adjust_environment(temperature, lighting_intensity)
+        logger.info(f"Room {db_room.number}: Temp={ac_device.value}, LI={bulb.value}")
+
+        return {"AC": ac_device, "Bulb": bulb}
 
     #Client
     def get_client(self, client_id: int):
@@ -146,15 +178,6 @@ class Storage:
             smart_client = self.clients.get(client_id)
             smart_client.checkout()
         return db_assignment
-
-    def adjust_environment(self, client_id: int, temperature: float, lighting_intensity: int):
-        smart_client = self.get_client(client_id)
-        if not smart_client:
-            raise ValueError("Client not found")
-        elif smart_client.getRoom() is None:
-            raise ValueError("Client is not checked in")
-        
-        smart_client.adjust_environment(temperature, lighting_intensity)
 
     def request_cleaning(self,db: Session, client_id: int):
         smart_client = self.get_client(client_id)

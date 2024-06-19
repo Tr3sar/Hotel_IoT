@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, UniqueConstraint, event, Float
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, UniqueConstraint, Float, Boolean
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -18,6 +18,7 @@ class CleaningStaff(Base):
     __tablename__ = "cleaning_staff"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), index=True)
+    working = Column(Boolean, default=False)
 
 class Reservation(Base):
     __tablename__ = "reservations"

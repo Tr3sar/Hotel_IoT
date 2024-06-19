@@ -7,6 +7,7 @@ from app.Devices.AC.AC import AC
 from app.Devices.Bulb.Bulb import Bulb
 from app.Sensors.ElectricityConsumptionSensor.ElectricityConsumptionSensor import ElectricityConsumptionSensor
 from app.Sensors.WaterFlowSensor.WaterFlowSensor import WaterFlowSensor
+from app.Sensors.SmokeSensor.SmokeSensor import SmokeSensor
 
 import os
 from dotenv import load_dotenv
@@ -27,6 +28,7 @@ class SmartRoom():
 
         self.electricity_consumption_sensor = ElectricityConsumptionSensor(self.number)
         self.water_flow_sensor = WaterFlowSensor(self.number)
+        self.smoke_sensor = SmokeSensor(self.number)
 
         self.notifier = SmartRoomNotifier(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
         self.subscriber = SmartRoomSubscriber(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))

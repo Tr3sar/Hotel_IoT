@@ -43,3 +43,20 @@ def update_room_status(room_number: int, request: schemas.UpdateRoomStatusReques
 @router.put("/{room_number}/environment", response_model=dict)
 def adjust_environment(room_number: int, request: schemas.AdjustEnvironmentRequest, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
     return storage.adjust_environment(db=db, room_number=room_number, temperature=request.temperature, lighting_intensity=request.lighting_intensity)
+
+@router.put("/{room_id}/simulate-fire")
+def simulate_fire(room_id: int, storage: storage_module.Storage = Depends(get_storage)):
+    try:
+        storage.trigger_smoke_detection(room_id)
+        return {"message": f"Simulated fire in room {room_id}"}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+#Canviar el nom de l'endpoint?
+@router.put("/{room_id}/reset-fire-simulation")
+def reset_fire_simulation(room_id: int, storage: storage_module.Storage = Depends(get_storage)):
+    try:
+        storage.reset_smoke_detection(room_id)
+        return {"message": f"Reset fire simulation in room {room_id}"}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))

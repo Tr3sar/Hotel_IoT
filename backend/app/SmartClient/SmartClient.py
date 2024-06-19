@@ -74,6 +74,7 @@ class SmartClient():
 
     #TODO: Implementar estos mètodes
     def make_reservation(self, reservation_id, reservation_type, start_Date):
+        #Falta notificar, bbdd ja està fet en storage
         print(f"Client {self.name} made a reservation with id {reservation_id} of type {reservation_type} starting on {start_Date}")
 
     def authenticate_rfid(self, rfid_code):

@@ -31,6 +31,7 @@ class Client(ClientBase):
 
 class CleaningStaffBase(BaseModel):
     name: str
+    working: bool
 
 class CleaningStaffCreate(CleaningStaffBase):
     pass

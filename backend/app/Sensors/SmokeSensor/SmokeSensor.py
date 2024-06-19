@@ -9,8 +9,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class SmokeSensor():
-    def __init__(self, sensor_id):
-        self.sensor_id = sensor_id
+    def __init__(self, room_id):
+        self.sensor_id = room_id
         self.smoke_level = 0
         self.smoke_detected = False
         self.notifier = SmokeSensorNotifier(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))

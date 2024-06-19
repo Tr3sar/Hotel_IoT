@@ -61,19 +61,22 @@ class Storage:
         for client in clients:
             self.clients[client.id] = SmartClient(client.id, client.name, client.email)
         
-        cleaning_staff = db.query(models.CleaningStaff).all()
-        for staff in cleaning_staff:
-            self.cleaning_staff[staff.id] = CleaningStaff(staff.id, staff.name)
-
-        reservations = db.query(models.Reservation).all()
-        for reservation in reservations:
-            self.clients[reservation.client_id].make_reservation(reservation.id, reservation.reservation_type, reservation.start_date)
-
         room_assignments = db.query(models.RoomAssignment).all()
         for assignment in room_assignments:
             #self.room_assignments[assignment.id] = assignment
             room_number = self.rooms[assignment.room_id].number
             self.clients[assignment.client_id].checkin(assignment.rfid_code, room_number)
+        
+        cleaning_staff = db.query(models.CleaningStaff).all()
+        for staff in cleaning_staff:
+            self.cleaning_staff[staff.id] = CleaningStaff(staff.id, staff.name)
+            if staff.working:
+                self.cleaning_staff[staff.id].start_shift()
+
+        #Revisar
+        reservations = db.query(models.Reservation).all()
+        for reservation in reservations:
+            self.clients[reservation.client_id].make_reservation(reservation.id, reservation.reservation_type, reservation.start_date)
 
     #Hotel
     def notify_event(self, event_info: str):
@@ -133,14 +136,13 @@ class Storage:
 
         return db_room
     
-    def adjust_environment(self, db: Session, client_id: int, temperature: int, lighting_intensity: int):
+    def adjust_environment(self, db: Session, room_number: int, temperature: int, lighting_intensity: int):
+        client_id = self.rooms[room_number].occupied_by
         smart_client = self.get_client(client_id)
         if not smart_client:
             raise ValueError("Client not found")
-        elif smart_client.getRoom() is None:
-            raise ValueError("Client is not checked in")
         
-        db_room = db.query(models.Room).filter(models.Room.number == smart_client.getRoom()).first()
+        db_room = db.query(models.Room).filter(models.Room.number == room_number).first()
         if not db_room or db_room.id not in self.rooms:
             raise HTTPException(status_code=404, detail="Room not found")
 
@@ -165,6 +167,20 @@ class Storage:
 
         return {"AC": ac_device, "Bulb": bulb}
 
+    def trigger_smoke_detection(self, room_id: int):
+        room = self.rooms.get(room_id)
+        if room and room.smoke_sensor:
+            room.smoke_sensor.trigger_smoke_detection()
+        else:
+            raise ValueError("No smoke sensor found for this room.")
+
+    def reset_smoke_detection(self, room_id: int):
+        room = self.rooms.get(room_id)
+        if room and room.smoke_sensor:
+            room.smoke_sensor.reset_smoke_detection()
+        else:
+            raise ValueError("No smoke sensor found for this room.")
+        
     #Client
     def get_client(self, client_id: int):
         return self.clients.get(client_id)
@@ -269,6 +285,24 @@ class Storage:
         self.cleaning_staff[db_staff.id] = db_staff
         return db_staff
 
+    def start_shift(self, db: Session, staff_id: int):
+        cleaning_staff = db.query(models.CleaningStaff).filter(models.CleaningStaff.id == staff_id).first()
+        if cleaning_staff:
+            cleaning_staff.working = True
+            db.commit()
+            return cleaning_staff
+        else:
+            raise ValueError("Cleaning staff not found")
+
+    def end_shift(self, db: Session, staff_id: int):
+        cleaning_staff = db.query(models.CleaningStaff).filter(models.CleaningStaff.id == staff_id).first()
+        if cleaning_staff:
+            cleaning_staff.working = False
+            db.commit()
+            return cleaning_staff
+        else:
+            raise ValueError("Cleaning staff not found")
+        
     #Reservation
     def get_reservations(self, db: Session, skip: int = 0, limit: int = 10):
         return db.query(models.Reservation).offset(skip).limit(limit).all()

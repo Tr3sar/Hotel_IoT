@@ -26,9 +26,9 @@ class SmartRoom():
         self.ac = AC(self.number)
         self.bulb = Bulb(self.number)
 
-        self.electricity_consumption_sensor = ElectricityConsumptionSensor(self.number)
-        self.water_flow_sensor = WaterFlowSensor(self.number)
-        self.smoke_sensor = SmokeSensor(self.number)
+        #self.electricity_consumption_sensor = ElectricityConsumptionSensor(self.number)
+        #self.water_flow_sensor = WaterFlowSensor(self.number)
+        #self.smoke_sensor = SmokeSensor(self.number)
 
         self.notifier = SmartRoomNotifier(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
         self.subscriber = SmartRoomSubscriber(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))

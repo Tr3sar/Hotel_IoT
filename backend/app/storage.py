@@ -331,16 +331,3 @@ class Storage:
                     status_code=500,
                     detail="An unexpected error occurred."
                 )
-
-    #Room assignment
-    #(Change to check-in, check-out)   ?????
-    def get_room_assignment(self, assignment_id: int):
-        return self.room_assignments.get(assignment_id)
-
-    def create_room_assignment(self, db: Session, assignment: schemas.RoomAssignmentCreate):
-        db_assignment = models.RoomAssignment(client_id=assignment.client_id, room_id=assignment.room_id)
-        db.add(db_assignment)
-        db.commit()
-        db.refresh(db_assignment)
-        self.room_assignments[db_assignment.id] = db_assignment
-        return db_assignment

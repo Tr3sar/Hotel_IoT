@@ -7,10 +7,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class ElectricityConsumptionSensor():
-    def __init__(self, sensor_id):
-        self.sensor_id = sensor_id
+    def __init__(self, room_id):
+        self.sensor_id = room_id
         self.voltage = 0  # Señal analógica simulada
         self.current = 0  # Corriente calculada después de ADC (Analog to Digital Conversion)
+        self.consumption_data = 0
         self.notifier = ElectricityConsumptionSensorNotifier(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
         self.run_mock_data()
 
@@ -27,7 +28,14 @@ class ElectricityConsumptionSensor():
         # Convertir la señal analógica a corriente
         # Suponemos un factor de conversión de 100A por 1V de salida
         self.current = self.voltage * 100
+        self.consumption_data += self.current
         return self.current
+    
+    def get_consumption_data(self):
+        return self.consumption_data
+    
+    def clear_consumption_data(self):
+        self.consumption_data = 0
 
     def notify_current(self):
         self.notifier.notify_current(self.sensor_id, self.current)

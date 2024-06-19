@@ -10,6 +10,12 @@ from app.SmartServices.Restaurant.RestaurantService import RestaurantService
 from app.SmartServices.Spa.SpaService import SpaService
 from app.Staff.CleaningStaff import CleaningStaff
 
+import schedule
+import threading
+import time
+import datetime
+from app.database import SessionLocal
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -22,6 +28,29 @@ class Storage:
         self.cleaning_staff = {}
         self.reservations = {}
         self.room_assignments = {}
+
+        schedule.every().hour.do(self.save_accumulated_data)
+
+        self.scheduler_thread = threading.Thread(target=self.run_scheduler)
+        self.scheduler_thread.start()
+
+    def run_scheduler(self):
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+
+    def save_accumulated_data(self):
+        db = SessionLocal()
+        try:
+            timestamp = datetime.utcnow()
+            for room in self.rooms:
+                self.record_light_consumption(db, room.get_number(), room.occupied_by, room.electricity_consumption_sensor.get_consumption_data(), timestamp)
+                self.record_water_consumption(db, room.get_number(), room.occupied_by, room.water_flow_sensor.get_flow_rate_sum(), timestamp)
+
+                room.electricity_consumption_sensor.clear_consumption_data()
+                room.water_flow_sensor.clear_flow_rate_sum()
+        finally:
+            db.close()
 
     def load_from_db(self, db: Session):
         rooms = db.query(models.Room).all()
@@ -50,6 +79,21 @@ class Storage:
     def notify_event(self, event_info: str):
         self.hotel.notify_event(event_info)
 
+    #Sensor
+    def record_light_consumption(self, db: Session, room_number: int, client_id: int, consumption: float, timestamp: datetime):
+        db_consumption = models.ElectricityConsumption(room_number=room_number, client_id=client_id, consumption=consumption, timestamp=timestamp)
+        db.add(db_consumption)
+        db.commit()
+        db.refresh(db_consumption)
+        return db_consumption
+
+    def record_water_consumption(self, db: Session, room_number: int, client_id: int, consumption: float, timestamp: datetime):
+        db_consumption = models.WaterConsumption(room_number=room_number, client_id=client_id, consumption=consumption, timestamp=timestamp)
+        db.add(db_consumption)
+        db.commit()
+        db.refresh(db_consumption)
+        return db_consumption
+    
     #Room
     def get_room(self, room_id: int):
         return self.rooms.get(room_id)

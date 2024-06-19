@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, UniqueConstraint, event
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, UniqueConstraint, event, Float
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -53,6 +53,22 @@ class Device(Base):
 
 Room.devices = relationship("Device", order_by=Device.id, back_populates="room")
 Client.reservations = relationship("Reservation", order_by=Reservation.id, back_populates="client")
+
+class ElectricityConsumption(Base):
+    __tablename__ = "electricity_consumption"
+    id = Column(Integer, primary_key=True, index=True)
+    client_id = Column(Integer, ForeignKey("clients.id"))
+    room_id = Column(Integer, ForeignKey("rooms.id"))
+    timestamp = Column(DateTime)
+    consumption = Column(Float)
+
+class WaterConsumption(Base):
+    __tablename__ = "water_consumption"
+    id = Column(Integer, primary_key=True, index=True)
+    client_id = Column(Integer, ForeignKey("clients.id"))
+    room_id = Column(Integer, ForeignKey("rooms.id"))
+    timestamp = Column(DateTime)
+    consumption = Column(Float)
 
 """
 @event.listens_for(Device, 'init')

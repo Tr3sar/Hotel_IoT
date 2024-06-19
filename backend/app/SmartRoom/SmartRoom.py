@@ -3,6 +3,11 @@ from app.SmartRoom.SmartRoomSubscriber import SmartRoomSubscriber
 
 from app.SmartRoom.RoomStatus import RoomStatus
 
+from app.Devices.AC.AC import AC
+from app.Devices.Bulb.Bulb import Bulb
+from app.Sensors.ElectricityConsumptionSensor.ElectricityConsumptionSensor import ElectricityConsumptionSensor
+from app.Sensors.WaterFlowSensor.WaterFlowSensor import WaterFlowSensor
+
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -10,10 +15,18 @@ load_dotenv()
 class SmartRoom():
     def __init__(self, number):
         self.number = number
-        self.temperature = 22
-        self.lightning_intensity = 100
         self.occupied_by = None
         self.status = RoomStatus.CLEAN.value
+
+
+        #Falta canviar les variables per els propis AC i Bulb
+        self.temperature = 22
+        self.lightning_intensity = 100
+        self.ac = AC(self.number)
+        self.bulb = Bulb(self.number)
+
+        self.electricity_consumption_sensor = ElectricityConsumptionSensor(self.number)
+        self.water_flow_sensor = WaterFlowSensor(self.number)
 
         self.notifier = SmartRoomNotifier(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
         self.subscriber = SmartRoomSubscriber(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))

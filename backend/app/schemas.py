@@ -84,6 +84,36 @@ class Device(DeviceBase):
     class Config:
         from_attributes = True
 
+class LightConsumptionBase(BaseModel):
+    client_id: int
+    room_id: int
+    timestamp: datetime
+    consumption: float
+
+class LightConsumptionCreate(LightConsumptionBase):
+    pass
+
+class LightConsumption(LightConsumptionBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+class WaterConsumptionBase(BaseModel):
+    client_id: int
+    room_id: int
+    timestamp: datetime
+    consumption: float
+
+class WaterConsumptionCreate(WaterConsumptionBase):
+    pass
+
+class WaterConsumption(WaterConsumptionBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
 class CheckInRequest(BaseModel):
     rfid_code: int
     room_number: int

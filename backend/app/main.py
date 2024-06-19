@@ -59,3 +59,7 @@ app.include_router(clients.router, prefix="/clients", dependencies=[Depends(get_
 app.include_router(cleaning_staff.router, prefix="/cleaning_staff", dependencies=[Depends(get_storage)])
 app.include_router(reservations.router, prefix="/reservations", dependencies=[Depends(get_storage)])
 app.include_router(hotel.router, prefix="/hotel", dependencies=[Depends(get_storage)])
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}

@@ -1,5 +1,6 @@
 from app.Sensors.WaterFlowSensor.WaterFlowSensorNotifier import WaterFlowSensorNotifier
 import random
+import threading
 import time
 import os
 from dotenv import load_dotenv
@@ -12,7 +13,8 @@ class WaterFlowSensor():
         self.flow_rate = 0
         self.flow_rate_sum = 0
         self.notifier = WaterFlowSensorNotifier(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
-        self.run_mock_data()
+        self.thread = threading.Thread(target=self.run_mock_data)
+        self.thread.start()
 
     def get_sensor_id(self):
         return self.sensor_id

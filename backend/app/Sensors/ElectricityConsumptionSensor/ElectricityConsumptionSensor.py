@@ -1,5 +1,6 @@
 from app.Sensors.ElectricityConsumptionSensor.ElectricityConsumptionSensorNotifier import ElectricityConsumptionSensorNotifier
 import random
+import threading
 import time
 import os
 from dotenv import load_dotenv
@@ -13,7 +14,8 @@ class ElectricityConsumptionSensor():
         self.current = 0  # Corriente calculada después de ADC (Analog to Digital Conversion)
         self.consumption_data = 0
         self.notifier = ElectricityConsumptionSensorNotifier(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
-        self.run_mock_data()
+        self.thread = threading.Thread(target=self.run_mock_data)
+        self.thread.start()
 
     def get_sensor_id(self):
         return self.sensor_id

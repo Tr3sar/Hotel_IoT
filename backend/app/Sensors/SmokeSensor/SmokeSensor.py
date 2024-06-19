@@ -2,6 +2,7 @@
 
 from app.Sensors.SmokeSensor.SmokeSensorNotifier import SmokeSensorNotifier
 import random
+import threading
 import time
 import os
 from dotenv import load_dotenv
@@ -14,7 +15,8 @@ class SmokeSensor():
         self.smoke_level = 0
         self.smoke_detected = False
         self.notifier = SmokeSensorNotifier(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
-        self.run()
+        self.thread = threading.Thread(target=self.run)
+        self.thread.start()
 
     def get_sensor_id(self):
         return self.sensor_id

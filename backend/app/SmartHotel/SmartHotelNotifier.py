@@ -1,6 +1,9 @@
 import paho.mqtt.client as mqtt
 import json
 
+import logging
+logger = logging.getLogger('SmartHotel')
+
 class SmartHotelNotifier:
     def __init__(self, hotel, broker, port):
         self.hotel = hotel
@@ -19,25 +22,25 @@ class SmartHotelNotifier:
         self.client.connect(self.broker, self.port, 60)
 
     def on_connect(self, client, userdata, flags, rc, properties=None):
-        print(f"Hotel Notifier: Connected to broker with result code {rc}")
+        logger.info(f"Hotel Notifier: Connected to broker with result code {rc}")
     
     def on_disconnect(self, client, userdata, rc, properties=None):
-        print(f"Hotel Notifier: Disconnected from broker with result code {rc}")
+        logger.info(f"Hotel Notifier: Disconnected from broker with result code {rc}")
     
     def on_publish(self, client, userdata, mid, rc,  properties=None):
-        print(f"Message published with ID: {mid}")
+        logger.info(f"Message published with ID: {mid}")
 
     def notify_event(self, event):
         payload = {"event": event}
         self.client.publish("hotel/events/notify", json.dumps(payload))
-        print(f"Event notification sent: {event}")
+        logger.info(f"Event notification sent: {event}")
 
     def notify_cleaning_staff(self, room_number):
         payload = {"room_number": room_number}
         self.client.publish("hotel/cleaning_staff/notify", json.dumps(payload))
-        print(f"Cleaning staff notification sent for room {room_number}")
+        logger.info(f"Cleaning staff notification sent for room {room_number}")
     
     def notify_smoke_alarm(self, room_number):
         payload = {"room_number": room_number}
         self.client.publish("hotel/security/notify", json.dumps(payload))
-        print(f"Security notification sent for room {room_number}")
+        logger.info(f"Security notification sent for room {room_number}")

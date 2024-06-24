@@ -57,6 +57,7 @@ class SmartRoom():
         else:
             print("Invalid room status")
             
+    #borrar?
     def notifyRoomStatus(self, status):
         if status in [status.value for status in RoomStatus]:
             self.status = status

@@ -1,6 +1,9 @@
 import paho.mqtt.client as mqtt
 import json
 
+import logging
+logger = logging.getLogger('Devices')
+
 class ACSubscriber:
     def __init__(self, ac, broker, port):
         self.ac = ac
@@ -18,7 +21,7 @@ class ACSubscriber:
         self.client.connect(self.broker, self.port, 60)
 
     def on_connect(self, client, userdata, flags, rc, properties=None):
-        print(f"AC Subscriber: Connected to broker with result code {rc}")
+        logger.info(f"AC Subscriber: Connected to broker with result code {rc}")
         self.client.subscribe(f"hotel/rooms/{self.ac.get_room_number()}/ac/temperature")
 
     def on_message(self, client, userdata, msg):
@@ -29,4 +32,4 @@ class ACSubscriber:
         room_number = data["room_number"]
         temperature = data["temperature"]
         self.ac.set_temperature(temperature)
-        print(f"Temperature change for room {room_number}: {temperature}")
+        logger.info(f"Temperature change for room {room_number}: {temperature}")

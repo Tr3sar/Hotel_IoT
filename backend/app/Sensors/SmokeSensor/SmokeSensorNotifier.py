@@ -1,6 +1,9 @@
 import paho.mqtt.client as mqtt
 import json
 
+import logging
+logger = logging.getLogger('Sensors')
+
 class SmokeSensorNotifier:
     def __init__(self, sensor, broker, port):
         self.sensor = sensor
@@ -19,15 +22,15 @@ class SmokeSensorNotifier:
         self.client.connect(self.broker, self.port, 60)
 
     def on_connect(self, client, userdata, flags, rc, properties=None):
-        print(f"Sensor {self.sensor.get_sensor_id()}: Client connected to broker with result code {rc}")
+        logger.info(f"Sensor {self.sensor.get_sensor_id()}: Client connected to broker with result code {rc}")
     
     def on_disconnect(self, client, userdata, rc, properties=None):
-        print(f"Sensor {self.sensor.get_sensor_id()}: Disconnected from broker with result code {rc}")
+        logger.info(f"Sensor {self.sensor.get_sensor_id()}: Disconnected from broker with result code {rc}")
     
     def on_publish(self, client, userdata, mid, properties=None):
-        print(f"Message published with ID: {mid}")
+        logger.info(f"Message published with ID: {mid}")
 
     def notify_smoke_detected(self, sensor_id, smoke_level):
         payload = {"sensor_id": sensor_id, "smoke_level": smoke_level}
         self.client.publish(f"hotel/sensors/smoke/{sensor_id}/detected", json.dumps(payload))
-        print(f"Smoke detected notification sent for sensor {sensor_id} with smoke level {smoke_level}")
+        logger.info(f"Smoke detected notification sent for sensor {sensor_id} with smoke level {smoke_level}")

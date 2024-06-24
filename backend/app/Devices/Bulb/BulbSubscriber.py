@@ -1,6 +1,9 @@
 import paho.mqtt.client as mqtt
 import json
 
+import logging
+logger = logging.getLogger('Devices')
+
 class BulbSubscriber:
     def __init__(self, bulb, broker, port):
         self.bulb = bulb
@@ -18,7 +21,7 @@ class BulbSubscriber:
         self.client.connect(self.broker, self.port, 60)
 
     def on_connect(self, client, userdata, flags, rc, properties=None):
-        print(f"Bulb Subscriber: Connected to broker with result code {rc}")
+        logger.info(f"Bulb Subscriber: Connected to broker with result code {rc}")
         self.client.subscribe(f"hotel/rooms/{self.bulb.get_room_number()}/bulb/intensity")
 
     def on_message(self, client, userdata, msg):
@@ -29,4 +32,4 @@ class BulbSubscriber:
         room_number = data["room_number"]
         intensity = data["intensity"]
         self.bulb.set_intensity(intensity)
-        print(f"Intensity change for room {room_number}: {intensity}")
+        logger.info(f"Intensity change for room {room_number}: {intensity}")

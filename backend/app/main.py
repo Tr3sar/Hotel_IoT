@@ -20,31 +20,63 @@ def load_data():
     finally:
         db.close()
 
-def setup_logging():
+def create_colored_logger(name, color):
     formatter = ColoredFormatter(
         "%(log_color)s%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         datefmt=None,
         reset=True,
         log_colors={
-            'DEBUG': 'cyan',
-            'INFO': 'green',
+            'DEBUG': 'reset',
+            'INFO': color,
             'WARNING': 'yellow',
-            'ERROR': 'red',
-            'CRITICAL': 'bold_red',
-        }
+            'ERROR': 'bold_red',
+            'CRITICAL': 'bold_red'
+        },
+        style='%'
     )
 
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)
 
-    logger = logging.getLogger()
+    logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
+
+    # Remove all handlers associated with the logger to avoid duplication
+    if logger.hasHandlers():
+        logger.handlers.clear()
+
     logger.addHandler(handler)
 
-load_data()  # Llamar a la función para cargar los datos al iniciar la aplicación
+    return logger
+
+def setup_logging():
+    log_colors = {
+        'Devices': 'blue',
+        'Sensors': 'green',
+        'SmartClient': 'yellow',
+        'SmartHotel': 'cyan',
+        'SmartRoom': 'cyan', #magenta
+        'SmartServices': 'red',
+        'Staff': 'white'
+    }
+
+    # Create loggers for each category
+    create_colored_logger('Devices', log_colors['Devices'])
+    create_colored_logger('Sensors', log_colors['Sensors'])
+    create_colored_logger('SmartClient', log_colors['SmartClient'])
+    create_colored_logger('SmartHotel', log_colors['SmartHotel'])
+    create_colored_logger('SmartRoom', log_colors['SmartRoom'])
+    create_colored_logger('SmartServices', log_colors['SmartServices'])
+    create_colored_logger('Staff', log_colors['Staff'])
 
 setup_logging()
 logger = logging.getLogger(__name__)
+logger.info("Starting the application")
+
+device_logger = logging.getLogger('Devices')
+device_logger.info("Starting the application")
+
+load_data()
 
 
 app = FastAPI()

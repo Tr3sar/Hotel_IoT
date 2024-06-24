@@ -1,6 +1,9 @@
 import paho.mqtt.client as mqtt
 import json
 
+import logging
+logger = logging.getLogger('SmartHotel')
+
 class SmartHotelSubscriber:
     def __init__(self, hotel, broker, port):
         self.hotel = hotel
@@ -18,7 +21,7 @@ class SmartHotelSubscriber:
         self.client.connect(self.broker, self.port, 60)
 
     def on_connect(self, client, userdata, flags, rc, properties=None):
-        print(f"Hotel Subscriber: Connected to broker with result code {rc}")
+        logger.info(f"Hotel Subscriber: Connected to broker with result code {rc}")
         self.client.subscribe("hotel/rooms/+/status")
     
     def on_message(self, client, userdata, msg):

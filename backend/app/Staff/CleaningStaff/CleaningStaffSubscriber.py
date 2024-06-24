@@ -1,6 +1,9 @@
 import paho.mqtt.client as mqtt
 import json
 
+import logging
+logger = logging.getLogger('Staff')
+
 class CleaningStaffSubscriber:
     def __init__(self, staff, broker, port):
         self.staff = staff
@@ -18,7 +21,7 @@ class CleaningStaffSubscriber:
         self.client.connect(self.broker, self.port, 60)
 
     def on_connect(self, client, userdata, flags, rc):
-        print(f"CleaningStaff Subscriber: Connected to broker with result code {rc}")
+        logger.info(f"CleaningStaff Subscriber: Connected to broker with result code {rc}")
         self.client.subscribe(f"hotel/cleaning_staff/{self.staff.get_id()}/task")
 
     def on_message(self, client, userdata, msg):
@@ -31,4 +34,4 @@ class CleaningStaffSubscriber:
         room_number = data["room_number"]
         status = data["status"]
         self.staff.add_task(room_number, status)
-        print(f"Task update for staff {staff_id} on room {room_number}: {status}")
+        logger.info(f"Task update for staff {staff_id} on room {room_number}: {status}")

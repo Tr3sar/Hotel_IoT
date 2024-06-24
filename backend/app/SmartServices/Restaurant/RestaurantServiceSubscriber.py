@@ -1,6 +1,9 @@
 import paho.mqtt.client as mqtt
 import json
 
+import logging
+logger = logging.getLogger('Services')
+
 class RestaurantServiceSubscriber:
     def __init__(self,restaurant, broker, port):
         self.restaurant = restaurant
@@ -18,7 +21,7 @@ class RestaurantServiceSubscriber:
         self.client.connect(self.broker, self.port, 60)
 
     def on_connect(self, client, userdata, flags, rc, properties = None):
-        print(f"Restaurant Service Subscriber: Connected to broker with result code {rc}")
+        logger.info(f"Restaurant Service Subscriber: Connected to broker with result code {rc}")
         self.client.subscribe("hotel/restaurant/reservations")
 
     def on_message(self, client, userdata, msg):
@@ -29,4 +32,4 @@ class RestaurantServiceSubscriber:
         client_id = data["client_id"]
         time = data["time"]
         self.restaurant.make_reservation(client_id, time)
-        print(f"New reservation: Client {client_id} at {time}")
+        logger.info(f"New reservation: Client {client_id} at {time}")

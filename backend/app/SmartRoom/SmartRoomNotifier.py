@@ -1,6 +1,9 @@
 import paho.mqtt.client as mqtt
 import json
 
+import logging
+logger = logging.getLogger('SmartRoom')
+
 class SmartRoomNotifier:
     def __init__(self, room, broker, port):
         self.smartRoom = room
@@ -19,15 +22,15 @@ class SmartRoomNotifier:
         self.client.connect(self.broker, self.port, 60)
 
     def on_connect(self, client, userdata, flags, rc, properties=None):
-        print(f"SmartRoom {self.smartRoom.get_number()}: Client connected to broker with result code {rc}")
+        logger.info(f"SmartRoom {self.smartRoom.get_number()}: Client connected to broker with result code {rc}")
     
     def on_disconnect(self, client, userdata, mid, rc, properties=None):
-        print(f"SmartRoom {self.smartRoom.get_number()}: Disconnected from broker with result code {rc}")
+        logger.info(f"SmartRoom {self.smartRoom.get_number()}: Disconnected from broker with result code {rc}")
     
     def on_publish(self, client, userdata, mid, rc, properties=None):
-        print(f"Message published with ID: {mid}")
+        logger.info(f"Message published with ID: {mid}")
 
     def notify_room_status(self, room_number, status):
         payload = {"room_number": room_number, "status": status}
         self.client.publish(f"hotel/rooms/{room_number}/status", json.dumps(payload))
-        print(f"Room status notification sent for room {room_number} with status {status}")
+        logger.info(f"Room status notification sent for room {room_number} with status {status}")

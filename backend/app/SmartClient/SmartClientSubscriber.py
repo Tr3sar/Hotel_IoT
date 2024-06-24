@@ -1,6 +1,9 @@
 import paho.mqtt.client as mqtt
 import json
 
+import logging
+logger = logging.getLogger('SmartClient')
+
 class SmartClientSubscriber:
     def __init__(self, client, broker, port):
         self.smartClient = client
@@ -15,17 +18,17 @@ class SmartClientSubscriber:
         self.client.loop_start()
 
     def _debug(self, message):
-        print(f"(SmartClient: {self.smartClient.getClientId()}) {message}")
+        logger.info(f"(SmartClient: {self.smartClient.getClientId()}) {message}")
 
     def loop_forever(self):
         self.client.loop_forever()
     
     def connect(self):
         self.client.connect(self.broker, self.port, 60)
-        print(f"Connected to broker {self.broker} on port {self.port}")
+        logger.info(f"Connected to broker {self.broker} on port {self.port}")
 
     def on_connect(self, client, userdata, flags, rc, properties=None):
-        print(f"Connected to broker with result code {rc}")
+        logger.info(f"Connected to broker with result code {rc}")
 
         self.client.subscribe(f"hotel/events/info")
 

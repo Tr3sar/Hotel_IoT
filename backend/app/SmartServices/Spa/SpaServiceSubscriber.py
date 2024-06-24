@@ -22,7 +22,7 @@ class SpaServiceSubscriber:
 
     def on_connect(self, client, userdata, flags, rc):
         logger.info(f"Spa Service Subscriber: Connected to broker with result code {rc}")
-        self.client.subscribe("hotel/spa/appointments")
+        self.client.subscribe("hotel/clients/+/reservations")
 
     def on_message(self, client, userdata, msg):
         data = json.loads(msg.payload.decode())

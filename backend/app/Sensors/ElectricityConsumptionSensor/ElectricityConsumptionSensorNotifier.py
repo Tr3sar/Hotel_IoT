@@ -30,7 +30,7 @@ class ElectricityConsumptionSensorNotifier:
     def on_publish(self, client, userdata, mid, properties=None):
         logger.info(f"Message published with ID: {mid}")
 
-    def notify_current(self, sensor_id, current):
-        payload = {"sensor_id": sensor_id, "current": current}
-        self.client.publish(f"hotel/sensors/electricity/{sensor_id}/current", json.dumps(payload))
-        logger.info(f"Current notification sent for sensor {sensor_id} with current {current}")
+    def notify_current(self, room_id, current):
+        payload = {"room_id": room_id, "type": "electricity", "current": current}
+        self.client.publish(f"hotel/rooms/{room_id}/consumption", json.dumps(payload))
+        logger.info(f"Current notification sent for room {room_id} with current {current}")

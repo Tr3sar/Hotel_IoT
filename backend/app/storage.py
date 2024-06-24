@@ -174,6 +174,7 @@ class Storage:
         else:
             raise ValueError("No smoke sensor found for this room.")
 
+    #No faria falta perque el sensor ja ho fa als 5 segons de detectar fum
     def reset_smoke_detection(self, room_id: int):
         room = self.rooms.get(room_id)
         if room and room.smoke_sensor:

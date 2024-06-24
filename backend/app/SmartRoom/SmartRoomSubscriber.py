@@ -46,12 +46,8 @@ class SmartRoomSubscriber:
             self.handle_checkout(data)
         elif msg.topic.endswith("status"):
             self.handle_room_status(data)
-        elif msg.topic.endswith("adjust_environment"):
+        elif msg.topic.endswith("environment"):
             self.handle_adjust_environment(data)
-        elif msg.topic.endswith("light_consumption"):
-            self.handle_light_consumption(data)
-        elif msg.topic.endswith("water_consumption"):
-            self.handle_water_consumption(data)
 
 
     def handle_checkin(self, data):

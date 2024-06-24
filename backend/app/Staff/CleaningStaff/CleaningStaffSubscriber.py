@@ -22,11 +22,11 @@ class CleaningStaffSubscriber:
 
     def on_connect(self, client, userdata, flags, rc):
         logger.info(f"CleaningStaff Subscriber: Connected to broker with result code {rc}")
-        self.client.subscribe(f"hotel/cleaning_staff/{self.staff.get_id()}/task")
+        self.client.subscribe(f"hotel/staff/cleanliness/{self.staff.get_id()}/task")
 
     def on_message(self, client, userdata, msg):
         data = json.loads(msg.payload.decode())
-        if "task" in msg.topic:
+        if msg.topic == f"hotel/staff/cleanliness/{self.staff.get_id()}/task":
             self.handle_task(data)
 
     def handle_task(self, data):

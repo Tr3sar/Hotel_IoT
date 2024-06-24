@@ -22,7 +22,7 @@ class RestaurantServiceSubscriber:
 
     def on_connect(self, client, userdata, flags, rc, properties = None):
         logger.info(f"Restaurant Service Subscriber: Connected to broker with result code {rc}")
-        self.client.subscribe("hotel/restaurant/reservations")
+        self.client.subscribe("hotel/clients/+/reservations")
 
     def on_message(self, client, userdata, msg):
         data = json.loads(msg.payload.decode())

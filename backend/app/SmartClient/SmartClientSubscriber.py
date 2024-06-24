@@ -47,22 +47,16 @@ class SmartClientSubscriber:
         if msg.topic == "hotel/events/info":
             self.handle_events_info(data)
         elif msg.topic == f"hotel/rooms/{self.smartClient.getRoom()}/status":
-            self.handle_room_status(data)
-        elif msg.topic == "hotel/restaurant/calendar":
-            self.handle_restaurant_calendar(data)
-        elif msg.topic == "hotel/spa/calendar":
-            self.handle_spa_calendar(data)
-        
+            self.handle_room_status(data)     
+        elif msg.topic == f"hotel/rooms/{self.smartClient.getRoom()}/consumption":
+            self.handle_consumption(data)   
 
     def handle_events_info(self, data):
         self._debug(f"Received events info: {data}")
     
     def handle_room_status(self, data):
         self._debug(f"Received room status: {data}")
-
-    #TODO: Implement restaurant and spa calendar services
-    def handle_restaurant_calendar(self, data):
-        self._debug(f"Received restaurant calendar: {data}")
     
-    def handle_spa_calendar(self, data):
-        self._debug(f"Received spa calendar: {data}")
+    def handle_consumption(self, data):
+        #es suscriu quan fa checkín a l'habitació, desuscriu quan fa check-out
+        self._debug(f"Received consumption: {data}")

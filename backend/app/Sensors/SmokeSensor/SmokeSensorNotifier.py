@@ -30,7 +30,7 @@ class SmokeSensorNotifier:
     def on_publish(self, client, userdata, mid, properties=None):
         logger.info(f"Message published with ID: {mid}")
 
-    def notify_smoke_detected(self, sensor_id, smoke_level):
-        payload = {"sensor_id": sensor_id, "smoke_level": smoke_level}
-        self.client.publish(f"hotel/sensors/smoke/{sensor_id}/detected", json.dumps(payload))
-        logger.info(f"Smoke detected notification sent for sensor {sensor_id} with smoke level {smoke_level}")
+    def notify_smoke_detected(self, room_id, smoke_level):
+        payload = {"room_id": room_id, "smoke_level": smoke_level}
+        self.client.publish(f"hotel/rooms/{room_id}/fire", json.dumps(payload))
+        logger.info(f"Smoke detected notification sent for room {room_id} with smoke level {smoke_level}")

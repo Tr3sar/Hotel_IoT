@@ -54,10 +54,10 @@ def setup_logging():
         'Devices': 'blue',
         'Sensors': 'green',
         'SmartClient': 'yellow',
-        'SmartHotel': 'cyan',
-        'SmartRoom': 'cyan', #magenta
+        'SmartHotel': 'bold_white',
+        'SmartRoom': 'purple',
         'SmartServices': 'red',
-        'Staff': 'white'
+        'Staff': 'cyan'
     }
 
     # Create loggers for each category

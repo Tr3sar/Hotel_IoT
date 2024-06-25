@@ -8,7 +8,7 @@ from app.SmartClient.SmartClient import SmartClient
 from app.SmartRoom.SmartRoom import SmartRoom, RoomStatus
 from app.SmartServices.Restaurant.RestaurantService import RestaurantService
 from app.SmartServices.Spa.SpaService import SpaService
-from app.Staff.CleaningStaff import CleaningStaff
+from app.Staff.CleaningStaff.CleaningStaff import CleaningStaff
 
 import schedule
 import threading
@@ -42,7 +42,7 @@ class Storage:
     def save_accumulated_data(self):
         db = SessionLocal()
         try:
-            timestamp = datetime.utcnow()
+            timestamp = datetime.UTC.now()
             for room in self.rooms:
                 self.record_light_consumption(db, room.get_number(), room.occupied_by, room.electricity_consumption_sensor.get_consumption_data(), timestamp)
                 self.record_water_consumption(db, room.get_number(), room.occupied_by, room.water_flow_sensor.get_flow_rate_sum(), timestamp)
@@ -69,7 +69,7 @@ class Storage:
         
         cleaning_staff = db.query(models.CleaningStaff).all()
         for staff in cleaning_staff:
-            self.cleaning_staff[staff.id] = CleaningStaff(staff.id, staff.name)
+            self.cleaning_staff[staff.id] = CleaningStaff(staff.id, staff.name, staff.working)
             if staff.working:
                 self.cleaning_staff[staff.id].start_shift()
 
@@ -109,6 +109,16 @@ class Storage:
         db.add(db_room)
         db.commit()
         db.refresh(db_room)
+
+        ac_device = models.Device(room_id=db_room.id, type="AC", value=22)
+        bulb_device = models.Device(room_id=db_room.id, type="Bulb", value=100)
+        
+        db.add(ac_device)
+        db.add(bulb_device)
+        db.commit()
+        db.refresh(ac_device)
+        db.refresh(bulb_device)
+
         self.rooms[db_room.id] = db_room
         return db_room
 
@@ -137,7 +147,18 @@ class Storage:
         return db_room
     
     def adjust_environment(self, db: Session, room_number: int, temperature: int, lighting_intensity: int):
-        client_id = self.rooms[room_number].occupied_by
+        
+        room_id = None
+        for rid, room in self.rooms.items():
+            if room.number == room_number:
+                room_id = rid
+                break
+
+        if room_id is None:
+            raise HTTPException(status_code=404, detail="Room not found")
+
+        client_id = self.rooms[room_id].get_occupied_by()
+        
         smart_client = self.get_client(client_id)
         if not smart_client:
             raise ValueError("Client not found")
@@ -145,7 +166,7 @@ class Storage:
         db_room = db.query(models.Room).filter(models.Room.number == room_number).first()
         if not db_room or db_room.id not in self.rooms:
             raise HTTPException(status_code=404, detail="Room not found")
-
+        
         ac_device = db.query(models.Device).filter_by(room_id=db_room.id, type="AC").first()
         bulb = db.query(models.Device).filter_by(room_id=db_room.id, type="Bulb").first()
 
@@ -154,7 +175,7 @@ class Storage:
 
         if not bulb:
             raise HTTPException(status_code=404, detail="Light Device not found")
-
+        
         ac_device.value = temperature
         bulb.value = lighting_intensity
 
@@ -163,11 +184,21 @@ class Storage:
         db.refresh(bulb)
 
         smart_client.adjust_environment(temperature, lighting_intensity)
+        
         logger.info(f"Room {db_room.number}: Temp={ac_device.value}, LI={bulb.value}")
 
-        return {"AC": ac_device, "Bulb": bulb}
+        return {"AC": ac_device.value, "Bulb": bulb.value}
 
-    def trigger_smoke_detection(self, room_id: int):
+    def trigger_smoke_detection(self, room_number: int):
+        room_id = None
+        for rid, room in self.rooms.items():
+            if room.number == room_number:
+                room_id = rid
+                break
+
+        if room_id is None:
+            raise HTTPException(status_code=404, detail="Room not found")
+        
         room = self.rooms.get(room_id)
         if room and room.smoke_sensor:
             room.smoke_sensor.trigger_smoke_detection()
@@ -192,8 +223,6 @@ class Storage:
         db.commit()
         db.refresh(db_client)
         self.clients[db_client.id] = db_client
-        print(self.clients)
-        print(self.clients[db_client.id])
         return db_client
 
     def get_clients(self, skip: int = 0, limit: int = 10):
@@ -287,23 +316,43 @@ class Storage:
         return db_staff
 
     def start_shift(self, db: Session, staff_id: int):
-        cleaning_staff = db.query(models.CleaningStaff).filter(models.CleaningStaff.id == staff_id).first()
-        if cleaning_staff:
-            cleaning_staff.working = True
+        cleaning_staff_db = db.query(models.CleaningStaff).filter(models.CleaningStaff.id == staff_id).first()
+        if cleaning_staff_db:
+            cleaning_staff_db.working = True
             db.commit()
-            return cleaning_staff
+
+            cleaning_staff = self.cleaning_staff.get(staff_id)
+            if not cleaning_staff:
+                raise HTTPException(status_code=404, detail="Cleaning staff not found")
+            
+            cleaning_staff.start_shift()
+            return {"id": staff_id, "name": cleaning_staff_db.name, "working": cleaning_staff_db.working}
         else:
             raise ValueError("Cleaning staff not found")
 
     def end_shift(self, db: Session, staff_id: int):
-        cleaning_staff = db.query(models.CleaningStaff).filter(models.CleaningStaff.id == staff_id).first()
-        if cleaning_staff:
-            cleaning_staff.working = False
+        cleaning_staff_db = db.query(models.CleaningStaff).filter(models.CleaningStaff.id == staff_id).first()
+        if cleaning_staff_db:
+            cleaning_staff_db.working = False
             db.commit()
-            return cleaning_staff
+
+            cleaning_staff = self.cleaning_staff.get(staff_id)
+            if not cleaning_staff:
+                raise HTTPException(status_code=404, detail="Cleaning staff not found")
+            
+            cleaning_staff.end_shift()
+            return {"id": staff_id, "name": cleaning_staff_db.name, "working": cleaning_staff_db.working}
         else:
             raise ValueError("Cleaning staff not found")
         
+    def complete_task(self, db: Session, staff_id: int):
+        cleaning_staff = self.cleaning_staff.get(staff_id)
+        if not cleaning_staff:
+            raise HTTPException(status_code=404, detail="Cleaning staff not found")
+        
+        cleaning_staff.complete_task()
+        return {"id": staff_id, "name": cleaning_staff.name, "working": cleaning_staff.working}
+
     #Reservation
     def get_reservations(self, db: Session, skip: int = 0, limit: int = 10):
         return db.query(models.Reservation).offset(skip).limit(limit).all()
@@ -314,11 +363,21 @@ class Storage:
     def create_reservation(self, db: Session, reservation: schemas.ReservationCreate):
         logger.info(f"Creating reservation for client {reservation.client_id}, type {reservation.reservation_type} at {reservation.start_date}")
         try:
+            if reservation.reservation_type not in ["restaurant", "spa"]:
+                raise HTTPException(status_code=400, detail="Invalid reservation type")
+            
             db_reservation = models.Reservation(client_id=reservation.client_id, reservation_type=reservation.reservation_type, start_date=reservation.start_date)
             db.add(db_reservation)
             db.commit()
             db.refresh(db_reservation)
             self.reservations[db_reservation.id] = db_reservation
+            
+            smart_client = self.clients.get(reservation.client_id)
+            if not smart_client:
+                raise HTTPException(status_code=404, detail="Client not found")
+        
+            smart_client.make_reservation(db_reservation.id, reservation.reservation_type, reservation.start_date)
+
             return db_reservation
         except IntegrityError as e:
             db.rollback()

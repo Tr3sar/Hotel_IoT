@@ -23,16 +23,54 @@ class SmartHotelSubscriber:
     def on_connect(self, client, userdata, flags, rc, properties=None):
         logger.info(f"Hotel Subscriber: Connected to broker with result code {rc}")
         self.client.subscribe("hotel/rooms/+/status")
+        self.client.subscribe("hotel/rooms/+/fire")
+        self.client.subscribe("hotel/staff/cleanliness/+/tasks")
+        self.client.subscribe("hotel/staff/cleanliness/+/shift")
     
     def on_message(self, client, userdata, msg):
         data = json.loads(msg.payload.decode())
 
         if "status" in msg.topic:
-            self.handle_room_status(data)
-
-    def handle_room_status(self, data):
-        status = data["status"]
+            self.handle_cleaning_task(data, "status")
+        elif "tasks" in msg.topic:
+            self.handle_cleaning_task(data, "tasks")
+        elif "shift" in msg.topic:
+            self.handle_shift(data)
+        elif "fire" in msg.topic:
+            self.handle_fire_alarm(data)
+    
+    def handle_cleaning_task(self, data, topic):
         room_number = data["room_number"]
+        status = data["status"]
 
-        if status == "CLEAN_REQUIRED":
-            self.hotel.notify_cleaning_staff(room_number)
+        if topic == "status":
+            if status == "clean-required":
+                if not self.hotel.get_active_cleaning_staff():
+                    logger.warning("No cleaning staff available")
+                    return
+                self.hotel.notify_clean_required(room_number)
+                logger.info(f"Room {room_number} requires cleaning")
+        elif topic == "tasks":
+            if status == "clean":
+                staff_id = data["staff_id"]
+                self.hotel.notify_room_cleaned(staff_id, room_number)
+            elif status == "cleaning":
+                self.hotel.notify_room_cleaning(room_number)
+    
+    def handle_shift(self, data):
+        status = data["status"]
+        staff_id = data["staff_id"]
+
+        if status == 'start':
+            self.hotel.add_active_cleaning_staff(staff_id)
+        elif status == 'end':
+            self.hotel.remove_active_cleaning_staff(staff_id)
+
+    def handle_fire_alarm(self, data):
+        room_number = data["room_number"]
+        smoke_level = data["smoke_level"]
+
+        #Notificar a qui ????
+        #self.hotel.notify_fire_alarm(room_number, smoke_level)
+        
+        logger.info(f"Fire alarm notification sent for room {room_number} with smoke level {smoke_level}")

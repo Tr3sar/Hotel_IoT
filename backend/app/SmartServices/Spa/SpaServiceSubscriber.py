@@ -26,10 +26,14 @@ class SpaServiceSubscriber:
 
     def on_message(self, client, userdata, msg):
         data = json.loads(msg.payload.decode())
-        self.handle_appointment(data)
+        self.handle_reservation(data)
 
-    def handle_appointment(self, data):
+    def handle_reservation(self, data):
+        reservation_type = data["reservation_type"]
+        if reservation_type != "spa":
+            return
+        
         client_id = data["client_id"]
-        time = data["time"]
-        self.spa.book_appointment(client_id, time)
-        logger.info(f"New appointment: Client {client_id} at {time}")
+        start_date = data["start_date"]
+        #Fer la reserva també a través de mqtt? A part de la bd? En cas que si, tornar a posar l'atribut reservation_id
+        logger.info(f"New reservation: Client {client_id} at {start_date}")

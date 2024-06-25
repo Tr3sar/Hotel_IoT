@@ -27,20 +27,20 @@ class CleaningStaffNotifier:
     def on_disconnect(self, client, userdata, rc, properties=None):
         logger.info(f"CleaningStaff {self.staff.staff_id}: Disconnected from broker with result code {rc}")
     
-    def on_publish(self, client, userdata, mid, properties=None):
+    def on_publish(self, client, userdata, mid, rc, properties=None):
         logger.info(f"Message published with ID: {mid}")
 
-    def notify_shift_start(self):
-        payload = {"staff_id": self.staff.staff_id, "status": "start"}
+    def notify_shift(self, status):
+        payload = {"staff_id": self.staff.staff_id, "status": status}
         self.client.publish(f"hotel/staff/cleanliness/{self.staff.staff_id}/shift", json.dumps(payload))
-        logger.info(f"Shift start notification sent for staff {self.staff.staff_id}")
+        logger.info(f"Shift {status} notification sent for staff {self.staff.staff_id}")
 
-    def notify_shift_end(self):
-        payload = {"staff_id": self.staff.staff_id, "status": "end"}
-        self.client.publish(f"hotel/staff/cleanliness/{self.staff.staff_id}/shift", json.dumps(payload))
-        logger.info(f"Shift end notification sent for staff {self.staff.staff_id}")
+    def notify_task_started(self, room_number):
+        payload = json.dumps({"room_number": room_number, "status": "cleaning"})
+        self.client.publish(f"hotel/staff/cleanliness/{self.staff.staff_id}/tasks", payload)
+        logger.info(f"Notified start of cleaning for room {room_number}")
 
     def notify_task_completed(self, room_number):
-        payload = {"staff_id": self.staff.staff_id, "room_number": room_number, "status": "completed"}
+        payload = {"staff_id": self.staff.staff_id, "room_number": room_number, "status": "clean"}
         self.client.publish(f"hotel/staff/cleanliness/{self.staff.staff_id}/tasks", json.dumps(payload))
         logger.info(f"Task completed notification sent for room {room_number}")

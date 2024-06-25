@@ -75,7 +75,7 @@ class SmartRoomSubscriber:
         self._debug(f"Adjusting environment to Temp={temperature}, LI={lightning_intensity}")
         self.smartRoom.adjust_environment(temperature, lightning_intensity)
     
-    #TODO: Implement light and water consumption handling and sensors
+    #TODO: L'habitació deuria rebre les dades de consum? (Ja les rep el client)
     def handle_light_consumption(self, data):
         logger.info(f"Room {self.smartRoom.get_number()} consumed {data['light_consumption']}W of light")
     

@@ -1,4 +1,3 @@
-from app.SmartRoom.SmartRoomNotifier import SmartRoomNotifier
 from app.SmartRoom.SmartRoomSubscriber import SmartRoomSubscriber
 
 from app.SmartRoom.RoomStatus import RoomStatus
@@ -21,6 +20,7 @@ class SmartRoom():
 
 
         #Falta canviar les variables per els propis AC i Bulb
+        #TODO: Decidir si canviem les propietats d'AC i Bulb per MQTT o per self.ac.setTemperature(temperature)
         self.temperature = 22
         self.lightning_intensity = 100
         self.ac = AC(self.number)
@@ -28,13 +28,15 @@ class SmartRoom():
 
         #self.electricity_consumption_sensor = ElectricityConsumptionSensor(self.number)
         #self.water_flow_sensor = WaterFlowSensor(self.number)
-        #self.smoke_sensor = SmokeSensor(self.number)
+        self.smoke_sensor = SmokeSensor(self.number)
 
-        self.notifier = SmartRoomNotifier(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
         self.subscriber = SmartRoomSubscriber(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
     
     def get_number(self):
         return self.number
+    
+    def get_occupied_by(self):
+        return self.occupied_by
 
     def adjust_environment(self, temperature, lightning_intensity):
         self.temperature = temperature
@@ -43,12 +45,16 @@ class SmartRoom():
 
     def occupy(self, client_id):
         self.occupied_by = client_id
+        #self.electricity_consumption_sensor.set_tracking_consumption(True)
+        #self.water_flow_sensor.set_tracking_consumption(True)
         print(f"Room {self.number} occupied by {self.occupied_by}")
 
     def vacate(self, client_id):
         if self.occupied_by == client_id:
             print(f"Room {self.number} vacated by {self.occupied_by}")
             self.occupied_by = None
+            #self.electricity_consumption_sensor.set_tracking_consumption(False)
+            #self.water_flow_sensor.set_tracking_consumption(False)
     
     def setRoomStatus(self, status):
         if status in [status.value for status in RoomStatus]:

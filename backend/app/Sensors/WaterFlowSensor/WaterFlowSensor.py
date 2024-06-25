@@ -12,12 +12,18 @@ class WaterFlowSensor():
         self.sensor_id = room_id
         self.flow_rate = 0
         self.flow_rate_sum = 0
+
+        self.tracking_consumption = False
+
         self.notifier = WaterFlowSensorNotifier(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
         self.thread = threading.Thread(target=self.run_mock_data)
         self.thread.start()
 
     def get_sensor_id(self):
         return self.sensor_id
+    
+    def set_tracking_consumption(self, tracking):
+        self.tracking_consumption = tracking
 
     def read_flow_rate(self):
         # Simular la lectura del caudal de agua generando pulsos aleatorios
@@ -38,6 +44,7 @@ class WaterFlowSensor():
     
     def run_mock_data(self):
         while True:
-            self.read_flow_rate()
-            self.notify_flow_rate()
+            if self.tracking_consumption:
+                self.read_flow_rate()
+                self.notify_flow_rate()
             time.sleep(10)

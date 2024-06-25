@@ -49,3 +49,10 @@ def end_shift(staff_id: int, db: Session = Depends(get_db), storage: storage_mod
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
+@router.put("/{staff_id}/complete_task", response_model=schemas.CleaningStaff)
+def complete_task(staff_id: int, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
+    try:
+        cleaning_staff = storage.complete_task(db=db, staff_id=staff_id)
+        return cleaning_staff
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))

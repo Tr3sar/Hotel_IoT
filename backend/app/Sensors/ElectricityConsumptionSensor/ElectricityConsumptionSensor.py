@@ -10,9 +10,12 @@ load_dotenv()
 class ElectricityConsumptionSensor():
     def __init__(self, room_id):
         self.sensor_id = room_id
-        self.voltage = 0  # Señal analógica simulada
-        self.current = 0  # Corriente calculada después de ADC (Analog to Digital Conversion)
+        self.voltage = 0  # Senyal analògica simulada en volts
+        self.current = 0  # Corrent calculada després d'ADC (Analog to Digital Conversion)
         self.consumption_data = 0
+
+        self.tracking_consumption = False
+
         self.notifier = ElectricityConsumptionSensorNotifier(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
         self.thread = threading.Thread(target=self.run_mock_data)
         self.thread.start()
@@ -20,15 +23,18 @@ class ElectricityConsumptionSensor():
     def get_sensor_id(self):
         return self.sensor_id
 
+    def set_tracking_consumption(self, tracking):
+        self.tracking_consumption = tracking
+    
     def read_voltage(self):
-        # Simular la lectura de la tensión generando valores aleatorios
-        # El sensor SCT013 produce una señal de salida proporcional a la corriente medida
-        self.voltage = random.uniform(0.0, 1.0)  # Simulación de señal analógica en voltios (0-1V)
+        # Simular la lectura de la tensió generant valors al·leatoris
+        # El sensor SCT013 produeix una senyal d'eixida proporcional a la corrent mesurada
+        self.voltage = random.uniform(0.0, 1.0)  # Simulació de senyal analògica en volts (0-1V)
         return self.voltage
 
     def convert_to_current(self):
-        # Convertir la señal analógica a corriente
-        # Suponemos un factor de conversión de 100A por 1V de salida
+        # Convertir la senyal analògica a corrent
+        # Suposem un factor de conversió de 100A per 1V d'eixida
         self.current = self.voltage * 100
         self.consumption_data += self.current
         return self.current
@@ -44,7 +50,8 @@ class ElectricityConsumptionSensor():
 
     def run_mock_data(self):
         while True:
-            self.read_voltage()
-            self.convert_to_current()
-            self.notify_current()
+            if self.tracking_consumption:
+                self.read_voltage()
+                self.convert_to_current()
+                self.notify_current()
             time.sleep(10)

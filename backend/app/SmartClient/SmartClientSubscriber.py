@@ -32,8 +32,7 @@ class SmartClientSubscriber:
 
         self.client.subscribe(f"hotel/events/info")
 
-        #TODO: Subscribe to other topics, check out if it is dynamic or static subscriptions
-        #TODO: Topics left: restaurant and spa calendar
+        #Al fer checkin es suscriu a hotel/rooms/{self.smartClient.getRoom()}/#
 
     def subscribe(self, topic):
         self.client.subscribe(topic)
@@ -58,5 +57,4 @@ class SmartClientSubscriber:
         self._debug(f"Received room status: {data}")
     
     def handle_consumption(self, data):
-        #es suscriu quan fa checkín a l'habitació, desuscriu quan fa check-out
         self._debug(f"Received consumption: {data}")

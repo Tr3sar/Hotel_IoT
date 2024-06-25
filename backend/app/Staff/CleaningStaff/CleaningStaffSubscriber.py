@@ -20,18 +20,18 @@ class CleaningStaffSubscriber:
     def connect(self):
         self.client.connect(self.broker, self.port, 60)
 
-    def on_connect(self, client, userdata, flags, rc):
+    def on_connect(self, client, userdata, flags, rc, properties=None):
         logger.info(f"CleaningStaff Subscriber: Connected to broker with result code {rc}")
-        self.client.subscribe(f"hotel/staff/cleanliness/{self.staff.get_id()}/task")
+        self.client.subscribe(f"hotel/staff/cleanliness/{self.staff.get_id()}/tasks")
 
     def on_message(self, client, userdata, msg):
         data = json.loads(msg.payload.decode())
-        if msg.topic == f"hotel/staff/cleanliness/{self.staff.get_id()}/task":
+        if msg.topic == f"hotel/staff/cleanliness/{self.staff.get_id()}/tasks":
             self.handle_task(data)
 
     def handle_task(self, data):
-        staff_id = data["staff_id"]
         room_number = data["room_number"]
         status = data["status"]
-        self.staff.add_task(room_number, status)
-        logger.info(f"Task update for staff {staff_id} on room {room_number}: {status}")
+        if status == "clean-required":    
+            self.staff.assign_task(room_number)
+            logger.info(f"Task update for staff {self.staff.staff_id} on room {room_number}")

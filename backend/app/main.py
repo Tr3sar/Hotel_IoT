@@ -73,9 +73,6 @@ setup_logging()
 logger = logging.getLogger(__name__)
 logger.info("Starting the application")
 
-device_logger = logging.getLogger('Devices')
-device_logger.info("Starting the application")
-
 load_data()
 
 

@@ -6,13 +6,10 @@ from app.storage import Storage
 import logging
 from colorlog import ColoredFormatter
 
-# Crear las tablas en la base de datos
 Base.metadata.create_all(bind=engine)
 
-# Inicializar el almacenamiento de forma global
 storage = Storage()
 
-# Cargar los datos desde la base de datos al almacenamiento en memoria
 def load_data():
     db = SessionLocal()
     try:
@@ -78,7 +75,6 @@ load_data()
 
 app = FastAPI()
 
-# Hacer que el almacenamiento se comparta entre todas las solicitudes
 def get_storage():
     return storage
 

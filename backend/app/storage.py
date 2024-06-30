@@ -42,7 +42,7 @@ class Storage:
     def save_accumulated_data(self):
         db = SessionLocal()
         try:
-            timestamp = datetime.UTC.now()
+            timestamp = datetime.datetime.now()
             for room in self.rooms:
                 self.record_light_consumption(db, room.get_number(), room.occupied_by, room.electricity_consumption_sensor.get_consumption_data(), timestamp)
                 self.record_water_consumption(db, room.get_number(), room.occupied_by, room.water_flow_sensor.get_flow_rate_sum(), timestamp)

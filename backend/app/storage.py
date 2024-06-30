@@ -57,7 +57,7 @@ class Storage:
         for room in rooms:
             self.rooms[room.id] = SmartRoom(room.number)
         
-        clients = db.query(models.Client).options(joinedload(models.Client.reservations)).all()
+        clients = db.query(models.Client).all()
         for client in clients:
             self.clients[client.id] = SmartClient(client.id, client.name, client.email)
         

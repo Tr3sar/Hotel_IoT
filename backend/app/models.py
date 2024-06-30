@@ -26,7 +26,6 @@ class Reservation(Base):
     client_id = Column(Integer, ForeignKey("clients.id"))
     reservation_type = Column(String(50))
     start_date = Column(DateTime)
-    client = relationship("Client", back_populates="reservations")
 
     __table_args__ = (UniqueConstraint('client_id', 'start_date', name='unique_client_start_date'),)
 
@@ -53,7 +52,7 @@ class Device(Base):
             self.value = 100
 
 Room.devices = relationship("Device", order_by=Device.id, back_populates="room")
-Client.reservations = relationship("Reservation", order_by=Reservation.id, back_populates="client")
+#Client.reservations = relationship("Reservation", order_by=Reservation.id, back_populates="client")
 
 class ElectricityConsumption(Base):
     __tablename__ = "electricity_consumption"
@@ -70,12 +69,3 @@ class WaterConsumption(Base):
     room_id = Column(Integer, ForeignKey("rooms.id"))
     timestamp = Column(DateTime)
     consumption = Column(Float)
-
-"""
-@event.listens_for(Device, 'init')
-def receive_init(target, args, kwargs):
-    if target.type == "AC":
-        target.value = 22
-    elif target.type == "Light":
-        target.value = 100
-"""

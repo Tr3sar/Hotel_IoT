@@ -296,7 +296,6 @@ class Storage:
         smart_client.requestRoomCleaning()
         return {'message': 'Cleaning requested successfully'}
 
-        #To implement
     
     def order_restaurant(self, client_id: int, order_details: str):
         client = self.get_client(client_id)

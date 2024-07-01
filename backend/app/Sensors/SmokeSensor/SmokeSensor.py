@@ -1,5 +1,3 @@
-# app/Sensors/SmokeSensor/SmokeSensor.py
-
 from app.Sensors.SmokeSensor.SmokeSensorNotifier import SmokeSensorNotifier
 import random
 import threading
@@ -23,15 +21,12 @@ class SmokeSensor():
 
     def read_smoke_level(self):
         if self.smoke_detected:
-            # Generar un valor alto para simular la detección de humo
             self.smoke_level = random.uniform(51, 100)
         else:
-            # Generar valores por debajo del umbral
             self.smoke_level = random.uniform(0, 49)
         return self.smoke_level
 
     def check_for_smoke(self):
-        # Definimos un umbral para la detección de humo
         THRESHOLD = 50.0
         if self.smoke_level > THRESHOLD:
             self.notifier.notify_smoke_detected(self.sensor_id, self.smoke_level)

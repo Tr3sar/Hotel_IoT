@@ -12,8 +12,7 @@ def get_db():
         yield db
     finally:
         db.close()
-
-# Obtener la instancia global de storage
+        
 def get_storage():
     from app.main import storage
     return storage

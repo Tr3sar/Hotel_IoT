@@ -26,9 +26,9 @@ class WaterFlowSensor():
         self.tracking_consumption = tracking
 
     def read_flow_rate(self):
-        # Simular la lectura del caudal de agua generando pulsos aleatorios
+        # Simular la lectura del caudal d'aigua generant pols aleatoris
         pulses = random.randint(10, 450)
-        # Convertir los pulsos a litros por minuto (1 pulso = 1/450 litro)
+        # Convertir els pols a litres per minut (1 pols = 1/450 litre)
         self.flow_rate = pulses / 450.0
         self.flow_rate_sum += self.flow_rate
         return self.flow_rate

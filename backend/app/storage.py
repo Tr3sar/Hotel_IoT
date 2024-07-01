@@ -23,11 +23,13 @@ logger = logging.getLogger(__name__)
 class Storage:
     def __init__(self):
         self.hotel = SmartHotel()
+        self.restaurant = RestaurantService()
+        self.spa = SpaService()
+        
         self.rooms = {}
         self.clients = {}
         self.cleaning_staff = {}
         self.reservations = {}
-        self.room_assignments = {}
 
         schedule.every().hour.do(self.save_accumulated_data)
 
@@ -63,7 +65,6 @@ class Storage:
         
         room_assignments = db.query(models.RoomAssignment).all()
         for assignment in room_assignments:
-            #self.room_assignments[assignment.id] = assignment
             room_number = self.rooms[assignment.room_id].number
             self.clients[assignment.client_id].checkin(assignment.rfid_code, room_number)
         
@@ -246,8 +247,6 @@ class Storage:
             db.add(db_assignment)
             db.commit()
             db.refresh(db_assignment)
-
-            self.room_assignments[db_assignment.id] = db_assignment
         except IntegrityError:
             db.rollback()
             raise HTTPException(status_code=400, detail="Room or RFID code already assigned")

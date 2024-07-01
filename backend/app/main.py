@@ -65,6 +65,7 @@ def setup_logging():
     create_colored_logger('SmartRoom', log_colors['SmartRoom'])
     create_colored_logger('SmartServices', log_colors['SmartServices'])
     create_colored_logger('Staff', log_colors['Staff'])
+    create_colored_logger(__name__, 'bold_white')
 
 setup_logging()
 logger = logging.getLogger(__name__)

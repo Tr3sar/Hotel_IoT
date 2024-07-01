@@ -43,7 +43,7 @@ class Storage:
         db = SessionLocal()
         try:
             timestamp = datetime.datetime.now()
-            for room in self.rooms:
+            for room in self.rooms.values():
                 self.record_light_consumption(db, room.get_number(), room.occupied_by, room.electricity_consumption_sensor.get_consumption_data(), timestamp)
                 self.record_water_consumption(db, room.get_number(), room.occupied_by, room.water_flow_sensor.get_flow_rate_sum(), timestamp)
 
@@ -257,16 +257,17 @@ class Storage:
         return db_assignment
 
     def check_out(self, db: Session, client_id: int, rfid_code: int, room_number: int):
-        logger.info(f"Checking out client {client_id} from room {room_number} with RFID {rfid_code}")
+        logger.warning(f"Checking out client {client_id} from room {room_number} with RFID {rfid_code}")
         db_room = db.query(models.Room).filter(models.Room.number == room_number).first()
         if not db_room:
             raise HTTPException(status_code=404, detail="Room not found")
+        if not client_id in self.clients.keys():
+                raise HTTPException(status_code=404, detail="Client not found")
         
         db_assignment = db.query(models.RoomAssignment).filter_by(client_id=client_id, room_id=db_room.id, rfid_code=rfid_code).first()
         if db_assignment:
             db.delete(db_assignment)
             db.commit()
-            del self.room_assignments[db_assignment.id]
 
             smart_client = self.clients.get(client_id)
             smart_client.checkout()

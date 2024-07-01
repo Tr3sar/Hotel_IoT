@@ -37,4 +37,4 @@ class RestaurantServiceSubscriber:
         client_id = data["client_id"]
         start_date = data["start_date"]
         #Fer la reserva també a través de mqtt? A part de la bd? En cas que si, tornar a posar l'atribut reservation_id
-        logger.info(f"New reservation: Client {client_id} at {start_date}")
+        logger.info(f"New restaurant reservation: Client {client_id} at {start_date}")

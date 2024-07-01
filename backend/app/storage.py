@@ -271,6 +271,8 @@ class Storage:
 
             smart_client = self.clients.get(client_id)
             smart_client.checkout()
+        else:
+            raise HTTPException(status_code=404, detail="Client is not checked in")
         return db_assignment
 
     def request_cleaning(self,db: Session, client_id: int):

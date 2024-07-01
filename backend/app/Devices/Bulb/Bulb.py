@@ -15,3 +15,6 @@ class Bulb:
 
     def set_intensity(self, intensity):
         self.intensity = intensity
+    
+    def get_intensity(self):
+        return self.intensity

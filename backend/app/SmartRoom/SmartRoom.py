@@ -18,11 +18,9 @@ class SmartRoom():
         self.occupied_by = None
         self.status = RoomStatus.CLEAN.value
 
-
-        #Falta canviar les variables per els propis AC i Bulb
         #TODO: Decidir si canviem les propietats d'AC i Bulb per MQTT o per self.ac.setTemperature(temperature)
-        self.temperature = 22
-        self.lightning_intensity = 100
+        #self.temperature = 22
+        #self.lightning_intensity = 100
         self.ac = AC(self.number)
         self.bulb = Bulb(self.number)
 
@@ -39,9 +37,8 @@ class SmartRoom():
         return self.occupied_by
 
     def adjust_environment(self, temperature, lightning_intensity):
-        self.temperature = temperature
-        self.lightning_intensity = lightning_intensity
-        print(f"Room {self.number}: Temp={self.temperature}, LI={self.lightning_intensity}")
+        self.ac.set_temperature(temperature)
+        self.bulb.set_intensity(lightning_intensity)
 
     def occupy(self, client_id):
         self.occupied_by = client_id

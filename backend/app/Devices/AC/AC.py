@@ -15,3 +15,6 @@ class AC:
 
     def set_temperature(self, temperature):
         self.temperature = temperature
+    
+    def get_temperature(self):
+        return self.temperature

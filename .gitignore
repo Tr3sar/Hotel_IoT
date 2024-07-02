@@ -80,3 +80,5 @@ build/
 dist/
 *.egg-info
 
+frontend/.angular/cache/17.3.8/hotel-iot/.tsbuildinfo
+frontend/.angular/cache/17.3.8/hotel-iot/.tsbuildinfo

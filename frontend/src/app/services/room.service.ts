@@ -7,9 +7,13 @@ import { Room } from '../models/room.model';
   providedIn: 'root'
 })
 export class RoomService {
-  private apiUrl = 'http://localhost:5000/api/rooms';
+  private apiUrl = 'http://localhost:5000/rooms';
 
   constructor(private http: HttpClient) { }
+
+  getRooms(): Observable<Room[]> {
+    return this.http.get<Room[]>(this.apiUrl);
+  }
 
   createRoom(room: Room): Observable<Room> {
     return this.http.post<Room>(this.apiUrl, room);
@@ -17,5 +21,13 @@ export class RoomService {
 
   setRoomStatus(roomNumber: number, status: string): Observable<any> {
     return this.http.put(`${this.apiUrl}/${roomNumber}/status`, { status });
+  }
+
+  adjustEnvironment(roomNumber: number, temperature: number, lightingIntensity: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${roomNumber}/environment`, { temperature, lighting_intensity: lightingIntensity });
+  }
+
+  simulateFire(roomId: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${roomId}/simulate_fire`, {});
   }
 }

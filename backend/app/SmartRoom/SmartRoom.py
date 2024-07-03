@@ -35,6 +35,22 @@ class SmartRoom():
     
     def get_occupied_by(self):
         return self.occupied_by
+    
+    def check_room_assignment_exists(self, client_id, room_id, rfid_code):
+        url = os.getenv("API_URL") + f"/room_assignment"
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Accept-Language": "es",
+        }
+        response = requests.get(url, headers=headers)
+        
+        if response.status_code == 200:
+            data = response.json()
+            for assignment in data:
+                if assignment['client_id'] == client_id and assignment['room_id'] == room_id and assignment['rfid_code'] == rfid_code:
+                    return True, assignment
+        return False, None
 
     def adjust_environment(self, temperature, lightning_intensity):
         self.ac.set_temperature(temperature)
@@ -50,19 +66,37 @@ class SmartRoom():
         response = requests.put(url, headers=headers, data=put_payload)
 
     def occupy(self, client_id, rfid_code):
-        url = os.getenv("API_URL") + f"/room_assignment"
-        put_payload = f'{{"client_id":"{client_id}", "room_number":"{self.number}", rfid_code":"{rfid_code}"}}'
-        headers = {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Accept-Language": "es",
-        }
-        response = requests.put(url, headers=headers, data=put_payload)
+        exists, assignment_data = self.check_room_assignment_exists(client_id, self.id, rfid_code)
 
-        self.assignment_id = response.json()["id"]
+        if exists:
+            self.assignment_id = assignment_data["id"]
+        else:
+
+
+            url = os.getenv("API_URL") + f"/room_assignment"
+            post_payload = {
+                "client_id": client_id,
+                "room_id": self.id,
+                "rfid_code": rfid_code
+            }
+            headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Accept-Language": "es",
+            }
+            response = requests.post(url, headers=headers, json=post_payload)
+
+            print(response.status_code)
+            if response.status_code == 200:
+                self.assignment_id = response.json().get("id")
+            else:
+                response.raise_for_status()
+
         self.occupied_by = client_id
         #self.electricity_consumption_sensor.set_tracking_consumption(True)
         #self.water_flow_sensor.set_tracking_consumption(True)
+
+        print(f'assignment {self.assignment_id}')
 
     def vacate(self, client_id, rfid_code):
         if self.occupied_by == client_id and self.assignment_id is not None:

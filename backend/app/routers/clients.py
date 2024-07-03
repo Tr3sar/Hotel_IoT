@@ -26,22 +26,16 @@ def get_clients(skip: int = 0, limit: int = 10, storage: storage_module.Storage 
     clients = storage.get_clients(skip=skip, limit=limit)
     return clients
 
-@router.put("/{client_id}/check_in")
-def check_in(client_id: int, request: schemas.CheckInRequest, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
-    return storage.check_in(db=db, client_id=client_id, rfid_code=request.rfid_code, room_number=request.room_number)
+@router.get("/{client_id}", response_model=schemas.Client)
+def get_client(client_id: int, storage: storage_module.Storage = Depends(get_storage)):
+    client = storage.get_client(client_id=client_id)
+    if client is None:
+        raise HTTPException(status_code=404, detail="Client not found")
+    return client
 
-@router.put("/{client_id}/check_out")
-def check_out(client_id: int, request: schemas.CheckInRequest, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
-    return storage.check_out(db=db, client_id=client_id, rfid_code=request.rfid_code, room_number=request.room_number)
-"""
-@router.put("/{client_id}/adjust_environment")
-def adjust_environment(client_id: int, request: schemas.AdjustEnvironmentRequest, storage: storage_module.Storage = Depends(get_storage)):
-    return storage.adjust_environment(client_id=client_id, temperature=request.temperature, lighting_intensity=request.lighting_intensity)
-"""
-@router.put("/{client_id}/request_cleaning")
-def request_cleaning(client_id: int, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
-    return storage.request_cleaning(db=db, client_id=client_id)
-
-@router.post("/{client_id}/order_restaurant")
-def order_restaurant(client_id: int, request: schemas.OrderRestaurantRequest, storage: storage_module.Storage = Depends(get_storage)):
-    return storage.order_restaurant(client_id=client_id, order_details=request.order_details)
+@router.put("/{client_id}", response_model=schemas.Client)
+def update_client(client_id: int, client: schemas.ClientCreate, storage: storage_module.Storage = Depends(get_storage)):
+    updated_client = storage.update_client(client_id=client_id, client=client)
+    if updated_client is None:
+        raise HTTPException(status_code=404, detail="Client not found")
+    return updated_client

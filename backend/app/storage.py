@@ -126,6 +126,31 @@ class Storage:
     def get_rooms(self, skip: int = 0, limit: int = 10):
         return list(self.rooms.values())[skip:skip + limit]
     
+    def update_room_devices(self, db: Session, room_id: int, temperature: int, lighting_intensity: int):
+        room = self.rooms.get(room_id)
+        if not room:
+            raise HTTPException(status_code=404, detail="Room not found")
+        
+        ac_device = db.query(models.Device).filter_by(room_id=room_id, type="AC").first()
+        bulb = db.query(models.Device).filter_by(room_id=room_id, type="Bulb").first()
+
+        if not ac_device:
+            raise HTTPException(status_code=404, detail="AC Device not found")
+
+        if not bulb:
+            raise HTTPException(status_code=404, detail="Light Device not found")
+        
+        ac_device.value = temperature
+        bulb.value = lighting_intensity
+
+        db.commit()
+        db.refresh(ac_device)
+        db.refresh(bulb)
+        
+        logger.info(f"Room {room.number}: Temp={ac_device.value}, LI={bulb.value}")
+
+        return {"AC": ac_device.value, "Bulb": bulb.value}
+    
     def update_room_status(self, db: Session, room_number: int, status: str):
         logger.info(f"Updating room {room_number} status to {status}")
         db_room = db.query(models.Room).filter(models.Room.number == room_number).first()
@@ -140,10 +165,6 @@ class Storage:
         db.add(db_room)
         db.commit()
         db.refresh(db_room)
-
-        if db_room.id in self.rooms:
-            self.rooms[db_room.id].status = status
-            self.rooms[db_room.id].notifyRoomStatus(status)
 
         return db_room
     
@@ -176,13 +197,6 @@ class Storage:
 
         if not bulb:
             raise HTTPException(status_code=404, detail="Light Device not found")
-        
-        ac_device.value = temperature
-        bulb.value = lighting_intensity
-
-        db.commit()
-        db.refresh(ac_device)
-        db.refresh(bulb)
 
         smart_client.adjust_environment(temperature, lighting_intensity)
         
@@ -206,14 +220,6 @@ class Storage:
         else:
             raise ValueError("No smoke sensor found for this room.")
 
-    #No faria falta perque el sensor ja ho fa als 5 segons de detectar fum
-    def reset_smoke_detection(self, room_id: int):
-        room = self.rooms.get(room_id)
-        if room and room.smoke_sensor:
-            room.smoke_sensor.reset_smoke_detection()
-        else:
-            raise ValueError("No smoke sensor found for this room.")
-        
     #Client
     def get_client(self, client_id: int):
         return self.clients.get(client_id)
@@ -230,8 +236,6 @@ class Storage:
         return list(self.clients.values())[skip:skip + limit]
     
     def check_in(self, db: Session, client_id: int, rfid_code: int, room_number: int):
-        logger.info(f"Checking in client {client_id} to room {room_number} with RFID {rfid_code}")
-
         smart_client = self.clients.get(client_id)
 
         if not smart_client:
@@ -256,7 +260,6 @@ class Storage:
         return db_assignment
 
     def check_out(self, db: Session, client_id: int, rfid_code: int, room_number: int):
-        logger.warning(f"Checking out client {client_id} from room {room_number} with RFID {rfid_code}")
         db_room = db.query(models.Room).filter(models.Room.number == room_number).first()
         if not db_room:
             raise HTTPException(status_code=404, detail="Room not found")
@@ -280,19 +283,7 @@ class Storage:
             raise ValueError("Client not found")
         elif smart_client.getRoom() is None:
             raise ValueError("Client is not checked in")
-        
-        db_room = db.query(models.Room).filter(models.Room.number == smart_client.getRoom()).first()
-        try:
-            db_room.status = RoomStatus.CLEAN_REQUIRED.value
-            db.add(db_room)
-            db.commit()
-            db.refresh(db_room)
-
-            self.rooms[db_room.id].status = RoomStatus.CLEAN_REQUIRED.value
-        except IntegrityError:
-            db.rollback()
-            raise HTTPException(status_code=400, detail="Could not request cleaning for room")
-            
+                    
         smart_client.requestRoomCleaning()
         return {'message': 'Cleaning requested successfully'}
 
@@ -316,37 +307,34 @@ class Storage:
         self.cleaning_staff[db_staff.id] = db_staff
         return db_staff
 
-    def start_shift(self, db: Session, staff_id: int):
-        cleaning_staff_db = db.query(models.CleaningStaff).filter(models.CleaningStaff.id == staff_id).first()
-        if cleaning_staff_db:
-            cleaning_staff_db.working = True
-            db.commit()
-
-            cleaning_staff = self.cleaning_staff.get(staff_id)
-            if not cleaning_staff:
-                raise HTTPException(status_code=404, detail="Cleaning staff not found")
-            
-            cleaning_staff.start_shift()
-            return {"id": staff_id, "name": cleaning_staff_db.name, "working": cleaning_staff_db.working}
-        else:
-            raise ValueError("Cleaning staff not found")
-
-    def end_shift(self, db: Session, staff_id: int):
-        cleaning_staff_db = db.query(models.CleaningStaff).filter(models.CleaningStaff.id == staff_id).first()
-        if cleaning_staff_db:
-            cleaning_staff_db.working = False
-            db.commit()
-
-            cleaning_staff = self.cleaning_staff.get(staff_id)
-            if not cleaning_staff:
-                raise HTTPException(status_code=404, detail="Cleaning staff not found")
-            
-            cleaning_staff.end_shift()
-            return {"id": staff_id, "name": cleaning_staff_db.name, "working": cleaning_staff_db.working}
-        else:
-            raise ValueError("Cleaning staff not found")
+    def update_cleaning_staff(self, db: Session, staff_id: int, staff: schemas.CleaningStaff):
+        db_staff = db.query(models.CleaningStaff).filter(models.CleaningStaff.id == staff_id).first()
+        if not db_staff:
+            raise HTTPException(status_code=404, detail="Cleaning staff not found")
+        db_staff.name = staff.name
+        db_staff.working = staff.working
+        db.commit()
+        db.refresh(db_staff)
+        return db_staff
+    
+    def start_shift(self, staff_id: int):
         
-    def complete_task(self, db: Session, staff_id: int):
+        cleaning_staff = self.cleaning_staff.get(staff_id)
+        if not cleaning_staff:
+            raise HTTPException(status_code=404, detail="Cleaning staff not found")
+        
+        cleaning_staff.start_shift()
+        return {"id": staff_id, "name": cleaning_staff.name, "working": cleaning_staff.working}
+
+    def end_shift(self, staff_id: int):
+        cleaning_staff = self.cleaning_staff.get(staff_id)
+        if not cleaning_staff:
+            raise HTTPException(status_code=404, detail="Cleaning staff not found")
+        
+        cleaning_staff.end_shift()
+        return {"id": staff_id, "name": cleaning_staff.name, "working": cleaning_staff.working}
+        
+    def complete_task(self, staff_id: int):
         cleaning_staff = self.cleaning_staff.get(staff_id)
         if not cleaning_staff:
             raise HTTPException(status_code=404, detail="Cleaning staff not found")
@@ -362,7 +350,6 @@ class Storage:
         return db.query(models.Reservation).filter(models.Reservation.id == reservation_id).first()
 
     def create_reservation(self, db: Session, reservation: schemas.ReservationCreate):
-        logger.info(f"Creating reservation for client {reservation.client_id}, type {reservation.reservation_type} at {reservation.start_date}")
         try:
             if reservation.reservation_type not in ["restaurant", "spa"]:
                 raise HTTPException(status_code=400, detail="Invalid reservation type")

@@ -20,7 +20,7 @@ class SpaServiceSubscriber:
     def connect(self):
         self.client.connect(self.broker, self.port, 60)
 
-    def on_connect(self, client, userdata, flags, rc):
+    def on_connect(self, client, userdata, flags, rc, properties=None):
         logger.info(f"Spa Service Subscriber: Connected to broker with result code {rc}")
         self.client.subscribe("hotel/clients/+/reservations")
 

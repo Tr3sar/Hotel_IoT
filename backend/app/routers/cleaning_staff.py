@@ -33,26 +33,6 @@ def get_cleaning_staff(skip: int = 0, limit: int = 10, storage: storage_module.S
     staff = storage.get_cleaning_staff(skip=skip, limit=limit)
     return staff
 
-@router.put("/{staff_id}/start-shift", response_model=schemas.CleaningStaff)
-def start_shift(staff_id: int, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
-    try:
-        cleaning_staff = storage.start_shift(db=db, staff_id=staff_id)
-        return cleaning_staff
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-
-@router.put("/{staff_id}/end-shift", response_model=schemas.CleaningStaff)
-def end_shift(staff_id: int, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
-    try:
-        cleaning_staff = storage.end_shift(db=db, staff_id=staff_id)
-        return cleaning_staff
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-
-@router.put("/{staff_id}/complete_task", response_model=schemas.CleaningStaff)
-def complete_task(staff_id: int, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
-    try:
-        cleaning_staff = storage.complete_task(db=db, staff_id=staff_id)
-        return cleaning_staff
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+@router.put("/{staff_id}", response_model=schemas.CleaningStaff)
+def update_cleaning_staff(staff_id: int, staff: schemas.CleaningStaff, db: Session = Depends(get_db), storage: storage_module.Storage = Depends()):
+    return storage.update_cleaning_staff(db=db, staff_id=staff_id, staff=staff)

@@ -96,8 +96,6 @@ class SmartRoom():
         #self.electricity_consumption_sensor.set_tracking_consumption(True)
         #self.water_flow_sensor.set_tracking_consumption(True)
 
-        print(f'assignment {self.assignment_id}')
-
     def vacate(self, client_id, rfid_code):
         if self.occupied_by == client_id and self.assignment_id is not None:
             url = os.getenv("API_URL") + f"/room_assignment/{self.assignment_id}"

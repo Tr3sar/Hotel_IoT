@@ -52,15 +52,17 @@ class SmartRoomSubscriber:
 
     def handle_checkin(self, data):
         client_id = data["client_id"]
+        rfid_code = data["rfid_code"]
 
         self._debug(f"Client {client_id} checked in")
-        self.smartRoom.occupy(client_id)
+        self.smartRoom.occupy(client_id, rfid_code)
 
     def handle_checkout(self, data):
         client_id = data["client_id"]
+        rfid_code = data["rfid_code"]
 
         self._debug(f"Client {client_id} checked out")
-        self.smartRoom.vacate(client_id)
+        self.smartRoom.vacate(client_id, rfid_code)
     
     def handle_room_status(self, data):
         status = data["status"]

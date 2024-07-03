@@ -6,5 +6,6 @@ pymysql
 pydantic
 python-dotenv
 paho-mqtt
+requests
 colorlog
 schedule

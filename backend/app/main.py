@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends
-from app.routers import rooms, clients, cleaning_staff, reservations
+from app.routers import rooms, clients, cleaning_staff, reservations, room_assignment
 from app.routers_simulation import simulation_rooms, simulation_clients, simulation_cleaning_staff, simulation_hotel
 from app.database import engine, Base, SessionLocal
 from app.storage import Storage
@@ -84,6 +84,7 @@ app.include_router(rooms.router, prefix="/rooms", dependencies=[Depends(get_stor
 app.include_router(clients.router, prefix="/clients", dependencies=[Depends(get_storage)])
 app.include_router(cleaning_staff.router, prefix="/cleaning_staff", dependencies=[Depends(get_storage)])
 app.include_router(reservations.router, prefix="/reservations", dependencies=[Depends(get_storage)])
+app.include_router(room_assignment.router, prefix="/room_assignment", dependencies=[Depends(get_storage)])
 
 app.include_router(simulation_rooms.router, prefix="/simulation/rooms", dependencies=[Depends(get_storage)])
 app.include_router(simulation_clients.router, prefix="/simulation/clients", dependencies=[Depends(get_storage)])

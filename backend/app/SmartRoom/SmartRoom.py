@@ -8,19 +8,19 @@ from app.Sensors.ElectricityConsumptionSensor.ElectricityConsumptionSensor impor
 from app.Sensors.WaterFlowSensor.WaterFlowSensor import WaterFlowSensor
 from app.Sensors.SmokeSensor.SmokeSensor import SmokeSensor
 
+import requests
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
 class SmartRoom():
-    def __init__(self, number):
+    def __init__(self, id, number):
+        self.id = id
         self.number = number
         self.occupied_by = None
+        self.assignment_id = None
         self.status = RoomStatus.CLEAN.value
 
-        #TODO: Decidir si canviem les propietats d'AC i Bulb per MQTT o per self.ac.setTemperature(temperature)
-        #self.temperature = 22
-        #self.lightning_intensity = 100
         self.ac = AC(self.number)
         self.bulb = Bulb(self.number)
 
@@ -40,31 +40,57 @@ class SmartRoom():
         self.ac.set_temperature(temperature)
         self.bulb.set_intensity(lightning_intensity)
 
-    def occupy(self, client_id):
+        url = os.getenv("API_URL") + f"/rooms/{self.id}/devices"
+        put_payload = f'{{"temperature":"{temperature}", "lighting_intensity":"{lightning_intensity}"}}'
+        headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Accept-Language": "es",
+        }
+        response = requests.put(url, headers=headers, data=put_payload)
+
+    def occupy(self, client_id, rfid_code):
+        url = os.getenv("API_URL") + f"/room_assignment"
+        put_payload = f'{{"client_id":"{client_id}", "room_number":"{self.number}", rfid_code":"{rfid_code}"}}'
+        headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Accept-Language": "es",
+        }
+        response = requests.put(url, headers=headers, data=put_payload)
+
+        self.assignment_id = response.json()["id"]
         self.occupied_by = client_id
         #self.electricity_consumption_sensor.set_tracking_consumption(True)
         #self.water_flow_sensor.set_tracking_consumption(True)
-        print(f"Room {self.number} occupied by {self.occupied_by}")
 
-    def vacate(self, client_id):
-        if self.occupied_by == client_id:
-            print(f"Room {self.number} vacated by {self.occupied_by}")
+    def vacate(self, client_id, rfid_code):
+        if self.occupied_by == client_id and self.assignment_id is not None:
+            url = os.getenv("API_URL") + f"/room_assignment/{self.assignment_id}"
+
+            headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Accept-Language": "es",
+            }
+            response = requests.delete(url, headers=headers)
+
             self.occupied_by = None
+            self.assignment_id = None
             #self.electricity_consumption_sensor.set_tracking_consumption(False)
             #self.water_flow_sensor.set_tracking_consumption(False)
     
     def setRoomStatus(self, status):
         if status in [status.value for status in RoomStatus]:
             self.status = status
-            print(f"Room {self.number} status set to {status}")
-        else:
-            print("Invalid room status")
             
-    #borrar?
-    def notifyRoomStatus(self, status):
-        if status in [status.value for status in RoomStatus]:
-            self.status = status
-            self.notifier.notify_room_status(self.number, status)
-            print(f"Room {self.number} status set to {status}")
+            url = os.getenv("API_URL") + f"/rooms/{self.number}/status"
+            put_payload = f'{{"status":"{status}"}}'
+            headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Accept-Language": "es",
+            }
+            response = requests.put(url, headers=headers, data=put_payload)
         else:
             print("Invalid room status")

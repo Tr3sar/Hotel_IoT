@@ -57,7 +57,7 @@ class Storage:
     def load_from_db(self, db: Session):
         rooms = db.query(models.Room).all()
         for room in rooms:
-            self.rooms[room.id] = SmartRoom(room.number)
+            self.rooms[room.id] = SmartRoom(room.id, room.number)
         
         clients = db.query(models.Client).all()
         for client in clients:
@@ -199,8 +199,6 @@ class Storage:
             raise HTTPException(status_code=404, detail="Light Device not found")
 
         smart_client.adjust_environment(temperature, lighting_intensity)
-        
-        logger.info(f"Room {db_room.number}: Temp={ac_device.value}, LI={bulb.value}")
 
         return {"AC": ac_device.value, "Bulb": bulb.value}
 
@@ -220,6 +218,41 @@ class Storage:
         else:
             raise ValueError("No smoke sensor found for this room.")
 
+    #RoomAssignment
+    def get_room_assignment(self, db: Session, assignment_id: int):
+        return db.query(models.RoomAssignment).filter(models.RoomAssignment.id == assignment_id).first()
+    
+    def get_room_assignments(self, db: Session, skip: int = 0, limit: int = 10):
+        return db.query(models.RoomAssignment).offset(skip).limit(limit).all()
+    
+    def create_room_assignment(self, db: Session, assignment: schemas.RoomAssignmentCreate):
+        db_room = db.query(models.Room).filter(models.Room.number == assignment.room_number).first()
+        if not db_room:
+            raise HTTPException(status_code=404, detail="Room not found")
+        
+        db_client = db.query(models.Client).filter(models.Client.id == assignment.client_id).first()
+        if not db_client:
+            raise HTTPException(status_code=404, detail="Client not found")
+        
+        try:
+            db_assignment = models.RoomAssignment(client_id=db_client.id, room_id=db_room.id, rfid_code=assignment.rfid_code)
+            db.add(db_assignment)
+            db.commit()
+            db.refresh(db_assignment)
+        except IntegrityError:
+            db.rollback()
+            raise HTTPException(status_code=400, detail="Room or RFID code already assigned")
+        
+        return db_assignment
+
+    def delete_room_assignment(self, db: Session, assignment_id: int):
+        db_assignment = db.query(models.RoomAssignment).filter(models.RoomAssignment.id == assignment_id).first()
+        if not db_assignment:
+            return None
+        db.delete(db_assignment)
+        db.commit()
+        return db_assignment
+    
     #Client
     def get_client(self, client_id: int):
         return self.clients.get(client_id)
@@ -245,19 +278,9 @@ class Storage:
         if not db_room:
             raise HTTPException(status_code=404, detail="Room not found")
         
-        db_assignment = models.RoomAssignment(client_id=client_id, room_id=db_room.id, rfid_code=rfid_code)
-        
-        try:
-            db.add(db_assignment)
-            db.commit()
-            db.refresh(db_assignment)
-        except IntegrityError:
-            db.rollback()
-            raise HTTPException(status_code=400, detail="Room or RFID code already assigned")
+        smart_client.checkin(rfid_code, room_number)
 
-        smart_client.checkin(db_assignment.rfid_code, room_number)
-
-        return db_assignment
+        return {"message": "Client checked in successfully"}
 
     def check_out(self, db: Session, client_id: int, rfid_code: int, room_number: int):
         db_room = db.query(models.Room).filter(models.Room.number == room_number).first()
@@ -266,18 +289,11 @@ class Storage:
         if not client_id in self.clients.keys():
                 raise HTTPException(status_code=404, detail="Client not found")
         
-        db_assignment = db.query(models.RoomAssignment).filter_by(client_id=client_id, room_id=db_room.id, rfid_code=rfid_code).first()
-        if db_assignment:
-            db.delete(db_assignment)
-            db.commit()
+        smart_client = self.clients.get(client_id)
+        smart_client.checkout()
+        return {"message": "Client checked out successfully"}
 
-            smart_client = self.clients.get(client_id)
-            smart_client.checkout()
-        else:
-            raise HTTPException(status_code=404, detail="Client is not checked in")
-        return db_assignment
-
-    def request_cleaning(self,db: Session, client_id: int):
+    def request_cleaning(self, client_id: int):
         smart_client = self.get_client(client_id)
         if not smart_client:
             raise ValueError("Client not found")
@@ -286,8 +302,7 @@ class Storage:
                     
         smart_client.requestRoomCleaning()
         return {'message': 'Cleaning requested successfully'}
-
-    
+ 
     def order_restaurant(self, client_id: int, order_details: str):
         client = self.get_client(client_id)
         if not client:

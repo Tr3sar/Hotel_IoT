@@ -4,6 +4,7 @@ from app.Staff.CleaningStaff.CleaningStaffNotifier import CleaningStaffNotifier
 import time
 import threading
 
+import requests
 import os
 from dotenv import load_dotenv
 
@@ -28,10 +29,28 @@ class CleaningStaff:
         self.working = True
         self.notifier.notify_shift('start')
 
+        url = os.getenv("API_URL") + f"/cleaning_staff/{self.staff_id}"
+        put_payload = f'{{"id":"{self.staff_id}", "name":"{self.name}", working":"{self.working}"}}'
+        headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Accept-Language": "es",
+        }
+        response = requests.put(url, headers=headers, data=put_payload)
+
     def end_shift(self):
         #Decidir que fer si encara hi ha tasques pendents de completar
         self.working = False
         self.notifier.notify_shift('end')
+        
+        url = os.getenv("API_URL") + f"/cleaning_staff/{self.staff_id}"
+        put_payload = f'{{"id":"{self.staff_id}", "name":"{self.name}", working":"{self.working}"}}'
+        headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Accept-Language": "es",
+        }
+        response = requests.put(url, headers=headers, data=put_payload)
 
     def assign_task(self, room_number):
         if self.working:

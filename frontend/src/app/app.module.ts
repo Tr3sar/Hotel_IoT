@@ -7,15 +7,21 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
+import {MatSidenavModule} from '@angular/material/sidenav';
+import { ConsumptionComponent } from './pages/consumption/consumption.component';
+
 @NgModule({
   declarations: [
     AppComponent,
+    ConsumptionComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+
+    MatSidenavModule
   ],
   providers: [
     provideAnimationsAsync()

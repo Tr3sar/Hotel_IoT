@@ -18,22 +18,22 @@ def get_storage():
     return storage
 
 @router.post("/", response_model=schemas.Room)
-def create_room(room: schemas.RoomCreate, db: Session = Depends(get_db), storage: storage_module.Storage = Depends()):
+def create_room(room: schemas.RoomCreate, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
     db_room = storage.get_room_by_number(db, number=room.number)
     if db_room:
         raise HTTPException(status_code=400, detail="Room already registered")
     return storage.create_room(db=db, room=room)
 
 @router.get("/{room_id}", response_model=schemas.Room)
-def get_room(room_id: int, storage: storage_module.Storage = Depends()):
+def get_room(room_id: int, storage: storage_module.Storage = Depends(get_storage)):
     room = storage.get_room(room_id)
     if room is None:
         raise HTTPException(status_code=404, detail="Room not found")
     return room
 
 @router.get("/", response_model=List[schemas.Room])
-def get_rooms(skip: int = 0, limit: int = 10, storage: storage_module.Storage = Depends()):
-    rooms = storage.get_rooms(skip=skip, limit=limit)
+def get_rooms(db: Session = Depends(get_db), skip: int = 0, limit: int = 10, storage: storage_module.Storage = Depends(get_storage)):
+    rooms = storage.get_rooms(db, skip=skip, limit=limit)
     return rooms
 
 @router.put("/{room_number}/status", response_model=schemas.Room)
@@ -41,5 +41,5 @@ def update_room_status(room_number: int, request: schemas.UpdateRoomStatusReques
     return storage.update_room_status(db=db, room_number=room_number, status=request.status)
 
 @router.put("/{room_id}/devices")
-def update_room_devices(room_id: int, request: schemas.AdjustEnvironmentRequest, storage: storage_module.Storage = Depends()):
+def update_room_devices(room_id: int, request: schemas.AdjustEnvironmentRequest, storage: storage_module.Storage = Depends(get_storage)):
     return storage.update_room_devices(room_id=room_id, temperature=request.temperature, lighting_intensity=request.lighting_intensity)

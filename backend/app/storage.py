@@ -123,8 +123,8 @@ class Storage:
         self.rooms[db_room.id] = db_room
         return db_room
 
-    def get_rooms(self, skip: int = 0, limit: int = 10):
-        return list(self.rooms.values())[skip:skip + limit]
+    def get_rooms(self, db: Session, skip: int = 0, limit: int = 10):
+        return db.query(models.Room).offset(skip).limit(limit).all()
     
     def update_room_devices(self, db: Session, room_id: int, temperature: int, lighting_intensity: int):
         room = self.rooms.get(room_id)
@@ -265,8 +265,8 @@ class Storage:
         self.clients[db_client.id] = db_client
         return db_client
 
-    def get_clients(self, skip: int = 0, limit: int = 10):
-        return list(self.clients.values())[skip:skip + limit]
+    def get_clients(self, db: Session, skip: int = 0, limit: int = 20):
+        return db.query(models.Client).offset(skip).limit(limit).all()
     
     def check_in(self, db: Session, client_id: int, rfid_code: int, room_number: int):
         smart_client = self.clients.get(client_id)

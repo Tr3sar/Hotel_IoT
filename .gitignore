@@ -2,7 +2,7 @@
 /frontend/node_modules
 /frontend/.npm
 /frontend/hotel-iot/.angular/cache
-
+frontend/.angular/cache
 # Python dependencies
 /venv
 **/.venv
@@ -79,6 +79,3 @@ htmlcov/
 build/
 dist/
 *.egg-info
-
-frontend/.angular/cache/17.3.8/hotel-iot/.tsbuildinfo
-frontend/.angular/cache/17.3.8/hotel-iot/.tsbuildinfo

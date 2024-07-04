@@ -1,0 +1,57 @@
+.sync-button{
+    border: none;
+    cursor: pointer;
+}
+
+.items-container{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    padding: 20px;
+
+    .item{
+        width: 5rem;
+        height: 5rem;
+        border: 1px solid black;
+        margin: 1rem;
+        padding: 0.25rem;
+        
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        position: relative;
+
+        .icon{
+            width: 1.5rem;
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .item-content {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .menu_button{
+            border: none;
+            cursor: pointer;
+
+            width: 1rem;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            flex-shrink: 0;
+        }
+
+        .text{
+            max-width: calc(100% - 1rem - 5px);
+            flex: 1 1 auto;
+        }
+    }
+}

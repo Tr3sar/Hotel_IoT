@@ -7,7 +7,7 @@ import { CleaningStaff } from '../models/cleaning_staff.model';
   providedIn: 'root'
 })
 export class CleaningStaffService {
-  private apiUrl = 'http://localhost:5000/cleaning_staff';
+  private apiUrl = 'http://localhost:8000/cleaning_staff';
 
   constructor(private http: HttpClient) { }
 

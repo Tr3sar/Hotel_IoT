@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 })
 export class HotelService {
 
-  private apiUrl = 'http://localhost:5000/hotel';
+  private apiUrl = 'http://localhost:8000/hotel';
   
   constructor(private http: HttpClient) { }
 

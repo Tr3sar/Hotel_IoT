@@ -1,0 +1,52 @@
+<main>
+    <h1 style="text-align: center;">hIoTel</h1>
+
+    <button class="sync-button" (click)="changeView()">
+        <mat-icon matTooltip="Canvia la vista">sync_alt</mat-icon>
+    </button>
+
+    <ng-container *ngIf="viewRooms">
+        <p>Habitacions</p>
+        <div class="items-container">
+            <div *ngFor="let room of rooms" class="item">
+                <div class="item-content">
+                    <span class="text">{{room.number}}</span>
+                    <mat-icon [matMenuTriggerFor]="menuRooms" class="menu_button">more_vert</mat-icon>
+                </div>                
+                
+                <span *ngIf="isRoomOccupied(room.id)" style="width: 100%;">
+                    <mat-icon class="icon" [matTooltip]="getClientByRoomId(room.id)!.name">person</mat-icon>
+                </span>
+
+                <mat-menu #menuRooms="matMenu">
+                    <button mat-menu-item>Adjust environment</button>
+                    <button mat-menu-item>Simulate fire</button>
+                </mat-menu>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="!viewRooms">
+        <p>Clients</p>
+        <div class="items-container">
+            <div *ngFor="let client of clients" class="item">
+                <div class="item-content">
+                    <span class="text">{{client.name}}</span>
+                    <mat-icon class="menu_button" [matMenuTriggerFor]="menuClients">more_vert</mat-icon>
+                </div>
+
+                <span *ngIf="isClientInRoom(client.id)">
+                        <mat-icon class="icon" [matTooltip]="getRoomByClientId(client.id)!.number.toString()">home</mat-icon>
+                </span>
+
+                <mat-menu #menuClients="matMenu">
+                    <button mat-menu-item>Check-in</button>
+                    <button mat-menu-item>Check-out</button>
+                    <button mat-menu-item>Request cleaning</button>
+                    <button mat-menu-item>Make reservation</button>
+                    <button mat-menu-item>Order restaurant</button>
+                </mat-menu>
+            </div>
+        </div>
+    </ng-container>
+</main>

@@ -8,6 +8,7 @@ import { Room } from '../models/room.model';
 })
 export class RoomService {
   private apiUrl = 'http://localhost:8000/rooms';
+  private simulationApiUrl = 'http://localhost:8000/simulation/rooms';
 
   constructor(private http: HttpClient) { }
 
@@ -24,10 +25,10 @@ export class RoomService {
   }
 
   adjustEnvironment(roomNumber: number, temperature: number, lightingIntensity: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${roomNumber}/environment`, { temperature, lighting_intensity: lightingIntensity });
+    return this.http.put(`${this.simulationApiUrl}/${roomNumber}/environment`, { temperature, lighting_intensity: lightingIntensity });
   }
 
   simulateFire(roomId: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${roomId}/simulate_fire`, {});
+    return this.http.put(`${this.simulationApiUrl}/${roomId}/simulate_fire`, {});
   }
 }

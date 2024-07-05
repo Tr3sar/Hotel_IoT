@@ -1,5 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { RoomService } from '../../../services/room.service';
 
 @Component({
   selector: 'app-adjust-environment-dialog',
@@ -12,17 +13,19 @@ export class AdjustEnvironmentDialogComponent {
 
   constructor(
     private dialogRef: MatDialogRef<AdjustEnvironmentDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: number
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private roomService: RoomService
   ) {}
 
   onCancel(): void {
     this.dialogRef.close();
   }
 
-  onSave(): void {
-    this.dialogRef.close({
-      temperature: this.temperature,
-      lighting_intensity: this.lighting_intensity
-    });
+  onSave(): void {;
+    this.roomService.adjustEnvironment(this.data.room_number, this.temperature, this.lighting_intensity).subscribe(
+      res => {
+        this.dialogRef.close({res});
+      }
+    );
   }
 }

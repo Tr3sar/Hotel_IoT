@@ -19,7 +19,7 @@
                 </span>
 
                 <mat-menu #menuRooms="matMenu">
-                    <button mat-menu-item (click)="openDialog('adjust_environment', room.id)">Adjust environment</button>
+                    <button mat-menu-item (click)="openDialog('adjust_environment', {'room_id': room.id, 'room_number': room.number})">Adjust environment</button>
                     <button mat-menu-item (click)="simulateFire()">Simulate fire</button>
                 </mat-menu>
             </div>
@@ -40,11 +40,11 @@
                 </span>
 
                 <mat-menu #menuClients="matMenu">
-                    <button mat-menu-item (click)="openDialog('checkin', client.id)">Check-in</button>
+                    <button mat-menu-item (click)="openDialog('checkin', {'client_id': client.id})">Check-in</button>
                     <button mat-menu-item (click)="checkout()">Check-out</button>
                     <button mat-menu-item (click)="requestCleaning()">Request cleaning</button>
-                    <button mat-menu-item (click)="openDialog('reservation', client.id)">Make reservation</button>
-                    <button mat-menu-item (click)="openDialog('order_restaurant', client.id)">Order restaurant</button>
+                    <button mat-menu-item (click)="openDialog('reservation', {'client_id': client.id})">Make reservation</button>
+                    <button mat-menu-item (click)="openDialog('order_restaurant', {'client_id': client.id})">Order restaurant</button>
                 </mat-menu>
             </div>
         </div>

@@ -81,29 +81,29 @@ export class DashboardComponent implements OnInit{
     console.warn('TODO: Implement requestCleaning() method');
   }
 
-  openDialog(type: string, id: number): void{
+  openDialog(type: string, data: any): void{
     let dialogRef;
 
     switch(type) {
       case 'checkin':
         dialogRef = this.dialog.open(CheckinDialogComponent, {
-          data: id
+          data: data
         });
         break;
       
       case 'reservation':
         dialogRef = this.dialog.open(ReservationDialogComponent, {
-          data: id
+          data: data
         });
         break;
       case 'order_restaurant':
         dialogRef = this.dialog.open(OrderRestaurantDialogComponent, {
-          data: id
+          data: data
         });
         break;
       case 'adjust_environment':
         dialogRef = this.dialog.open(AdjustEnvironmentDialogComponent, {
-          data: id
+          data: data
         });
         break;
       default:

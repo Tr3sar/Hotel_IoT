@@ -56,9 +56,9 @@ class SmartClient():
 
     def checkout(self):
         print(f"Client {self.name} checked out from room {self.room_number}")
+        self.notifier.notify_checkout(self.client_id, self.room_number)
         self.rfid_code = None
         self.room_number = None
-        self.notifier.notify_checkout(self.client_id, self.room_number)
 
     def adjust_environment(self,temperature, lighting_intensity):
         if not self.room_number:

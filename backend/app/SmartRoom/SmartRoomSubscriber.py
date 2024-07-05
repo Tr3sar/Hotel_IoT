@@ -54,15 +54,14 @@ class SmartRoomSubscriber:
         client_id = data["client_id"]
         rfid_code = data["rfid_code"]
 
-        self._debug(f"Client {client_id} checked in")
+        logger.info(f"Client {client_id} checked in")
         self.smartRoom.occupy(client_id, rfid_code)
 
     def handle_checkout(self, data):
         client_id = data["client_id"]
-        rfid_code = data["rfid_code"]
 
-        self._debug(f"Client {client_id} checked out")
-        self.smartRoom.vacate(client_id, rfid_code)
+        logger.info(f"Client {client_id} checked out")
+        self.smartRoom.vacate(client_id)
     
     def handle_room_status(self, data):
         status = data["status"]
@@ -74,7 +73,7 @@ class SmartRoomSubscriber:
         temperature = data["temperature"]
         lightning_intensity = data["lightning_intensity"]
 
-        self._debug(f"Adjusting environment to Temp={temperature}, LI={lightning_intensity}")
+        logger.info(f"Adjusting environment to Temp={temperature}, LI={lightning_intensity}")
         self.smartRoom.adjust_environment(temperature, lightning_intensity)
     
     #TODO: L'habitació deuria rebre les dades de consum? (Ja les rep el client)

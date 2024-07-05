@@ -212,7 +212,7 @@ class Storage:
         return db.query(models.RoomAssignment).offset(skip).limit(limit).all()
     
     def create_room_assignment(self, db: Session, assignment: schemas.RoomAssignmentCreate):
-        db_room = db.query(models.Room).filter(models.Room.number == assignment.room_number).first()
+        db_room = db.query(models.Room).filter(models.Room.id == assignment.room_id).first()
         if not db_room:
             raise HTTPException(status_code=404, detail="Room not found")
         
@@ -254,24 +254,41 @@ class Storage:
     def get_clients(self, db: Session, skip: int = 0, limit: int = 20):
         return db.query(models.Client).offset(skip).limit(limit).all()
     
-    def check_in(self, db: Session, client_id: int, rfid_code: int, room_number: int):
+    def check_in(self, client_id: int, rfid_code: int, room_number: int):
         smart_client = self.clients.get(client_id)
 
         if not smart_client:
             raise HTTPException(status_code=404, detail="Client not found")
 
-        db_room = db.query(models.Room).filter(models.Room.number == room_number).first()
-        if not db_room:
+        smart_room = None
+        for room in self.rooms.values():
+            if room.number == room_number:
+                smart_room = room
+                break
+                
+        if not smart_room:
             raise HTTPException(status_code=404, detail="Room not found")
+        
+        if room.occupied_by is not None:
+            raise HTTPException(status_code=400, detail="Room is already occupied")
         
         smart_client.checkin(rfid_code, room_number)
 
         return {"message": "Client checked in successfully"}
 
-    def check_out(self, db: Session, client_id: int, rfid_code: int, room_number: int):
-        db_room = db.query(models.Room).filter(models.Room.number == room_number).first()
-        if not db_room:
+    def check_out(self, client_id: int, rfid_code: int, room_number: int):
+        smart_room = None
+        for room in self.rooms.values():
+            if room.number == room_number:
+                smart_room = room
+                break
+                
+        if not smart_room:
             raise HTTPException(status_code=404, detail="Room not found")
+        
+        if room.occupied_by is not client_id:
+            raise HTTPException(status_code=400, detail="Room not occupied by this client")
+        
         if not client_id in self.clients.keys():
                 raise HTTPException(status_code=404, detail="Client not found")
         

@@ -1,5 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ClientService } from '../../../services/client.service';
 
 @Component({
   selector: 'app-order-restaurant-dialog',
@@ -11,7 +12,8 @@ export class OrderRestaurantDialogComponent {
 
   constructor(
     private dialogRef: MatDialogRef<OrderRestaurantDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: number
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private clientService: ClientService
   ) {}
 
   onCancel(): void {
@@ -19,8 +21,10 @@ export class OrderRestaurantDialogComponent {
   }
 
   onSave(): void {
-    this.dialogRef.close({
-      order_details: this.order_details
-    });
+    this.clientService.orderRestaurant(this.data.client_id, this.order_details).subscribe(
+      res => {
+        this.dialogRef.close({res});
+      }
+    );
   }
 }

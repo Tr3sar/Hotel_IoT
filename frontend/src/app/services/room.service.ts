@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Room } from '../models/room.model';
 
 @Injectable({
@@ -13,22 +13,22 @@ export class RoomService {
   constructor(private http: HttpClient) { }
 
   getRooms(): Observable<Room[]> {
-    return this.http.get<Room[]>(this.apiUrl);
+    return this.http.get<Room[]>(this.apiUrl)
   }
 
   createRoom(room: Room): Observable<Room> {
-    return this.http.post<Room>(this.apiUrl, room);
+    return this.http.post<Room>(this.apiUrl, room)
   }
 
   setRoomStatus(roomNumber: number, status: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${roomNumber}/status`, { status });
+    return this.http.put(`${this.apiUrl}/${roomNumber}/status`, { status })
   }
 
   adjustEnvironment(roomNumber: number, temperature: number, lightingIntensity: number): Observable<any> {
-    return this.http.put(`${this.simulationApiUrl}/${roomNumber}/environment`, { temperature, lighting_intensity: lightingIntensity });
+    return this.http.put(`${this.simulationApiUrl}/${roomNumber}/environment`, { temperature, lighting_intensity: lightingIntensity })
   }
 
   simulateFire(roomId: number): Observable<any> {
-    return this.http.put(`${this.simulationApiUrl}/${roomId}/simulate_fire`, {});
+    return this.http.put(`${this.simulationApiUrl}/${roomId}/simulate_fire`, {})
   }
 }

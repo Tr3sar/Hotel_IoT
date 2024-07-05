@@ -10,13 +10,14 @@ import { CheckinDialogComponent } from '../../components/dialog/checkin-dialog/c
 import { ReservationDialogComponent } from '../../components/dialog/reservation-dialog/reservation-dialog.component';
 import { OrderRestaurantDialogComponent } from '../../components/dialog/order-restaurant/order-restaurant-dialog.component';
 import { AdjustEnvironmentDialogComponent } from '../../components/dialog/adjust-environment/adjust-environment-dialog.component';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent implements OnInit{
+export class DashboardComponent implements OnInit {
   rooms: Room[] = [];
   clients: Client[] = [];
   roomAssignments: RoomAssignment[] = [];
@@ -27,8 +28,8 @@ export class DashboardComponent implements OnInit{
     private clientService: ClientService,
     private roomService: RoomService,
     private roomAssignmentService: RoomAssignmentService,
-    private dialog: MatDialog  
-  ) {}
+    private dialog: MatDialog
+  ) { }
 
   ngOnInit() {
     this.roomService.getRooms().subscribe((rooms: Room[]) => {
@@ -73,46 +74,69 @@ export class DashboardComponent implements OnInit{
     console.warn('TODO: Implement simulateFire() method');
   }
 
-  checkout(): void {
-    console.warn('TODO: Implement checkout() method');
+  checkout(client_id: number): void {
+    let room_id = this.roomAssignments.find((roomAssignment: RoomAssignment) => roomAssignment.client_id === client_id)!.room_id;
+    let room_number = this.rooms.find((room: Room) => room.id === room_id)!.number;
+    let rfid_code = this.roomAssignments.find((roomAssignment: RoomAssignment) => roomAssignment.client_id === client_id)!.rfid_code;
+
+    this.roomAssignments = this.roomAssignments.filter((roomAssignment: RoomAssignment) => roomAssignment.client_id !== client_id);
+    this.clientService.checkoutClient(client_id, room_number, rfid_code).subscribe();
   }
 
   requestCleaning(): void {
     console.warn('TODO: Implement requestCleaning() method');
   }
 
-  openDialog(type: string, data: any): void{
+  openDialog(type: string, data: any): void {
     let dialogRef;
 
-    switch(type) {
+    switch (type) {
       case 'checkin':
         dialogRef = this.dialog.open(CheckinDialogComponent, {
           data: data
         });
+
+        dialogRef.afterClosed().subscribe(result => {
+          if (result === undefined) return;
+          console.table(result);
+          let roomId = this.rooms.find((room: Room) => room.number == result.room_number)!.id;
+          let lastAssignment = this.roomAssignments[this.roomAssignments.length - 1];
+          let lastAssignmentId = lastAssignment ? lastAssignment.id : 0;
+          let roomAssignment = {'client_id': result.client_id, 'room_id': roomId, 'rfid_code': result.rfid_code, 'expense': 0, id: lastAssignmentId + 1 || 1}
+          this.roomAssignments.push(roomAssignment);
+        });
         break;
-      
+
       case 'reservation':
         dialogRef = this.dialog.open(ReservationDialogComponent, {
           data: data
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+          console.table(result);
         });
         break;
       case 'order_restaurant':
         dialogRef = this.dialog.open(OrderRestaurantDialogComponent, {
           data: data
         });
+
+        dialogRef.afterClosed().subscribe(result => {
+          console.table(result);
+        });
         break;
       case 'adjust_environment':
         dialogRef = this.dialog.open(AdjustEnvironmentDialogComponent, {
           data: data
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+          console.table(result);
         });
         break;
       default:
         console.error('Invalid dialog type');
         return;
     }
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.table(result);
-    });
   }
 }

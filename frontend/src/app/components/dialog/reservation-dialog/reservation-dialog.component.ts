@@ -1,5 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ClientService } from '../../../services/client.service';
 
 @Component({
   selector: 'app-reservation-dialog',
@@ -14,7 +15,8 @@ export class ReservationDialogComponent {
 
   constructor(
     private dialogRef: MatDialogRef<ReservationDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: number
+    @Inject(MAT_DIALOG_DATA) public data: number,
+    private clientService: ClientService
   ) {}
 
   onCancel(): void {
@@ -22,9 +24,10 @@ export class ReservationDialogComponent {
   }
 
   onSave(): void {
-    this.dialogRef.close({
-      reservation_type: this.reservation_type,
-      datetime: this.datetime
-    });
+    this.clientService.makeReservation(this.data, this.reservation_type, this.datetime).subscribe(
+      res => {
+        this.dialogRef.close({res});
+      }
+    );
   }
 }

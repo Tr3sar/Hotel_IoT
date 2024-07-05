@@ -168,8 +168,7 @@ class Storage:
 
         return db_room
     
-    def adjust_environment(self, db: Session, room_number: int, temperature: int, lighting_intensity: int):
-        
+    def adjust_environment(self, room_number: int, temperature: int, lighting_intensity: int):
         room_id = None
         for rid, room in self.rooms.items():
             if room.number == room_number:
@@ -184,23 +183,10 @@ class Storage:
         smart_client = self.get_client(client_id)
         if not smart_client:
             raise ValueError("Client not found")
-        
-        db_room = db.query(models.Room).filter(models.Room.number == room_number).first()
-        if not db_room or db_room.id not in self.rooms:
-            raise HTTPException(status_code=404, detail="Room not found")
-        
-        ac_device = db.query(models.Device).filter_by(room_id=db_room.id, type="AC").first()
-        bulb = db.query(models.Device).filter_by(room_id=db_room.id, type="Bulb").first()
-
-        if not ac_device:
-            raise HTTPException(status_code=404, detail="AC Device not found")
-
-        if not bulb:
-            raise HTTPException(status_code=404, detail="Light Device not found")
 
         smart_client.adjust_environment(temperature, lighting_intensity)
 
-        return {"AC": ac_device.value, "Bulb": bulb.value}
+        return {"AC": temperature, "Bulb": lighting_intensity}
 
     def trigger_smoke_detection(self, room_number: int):
         room_id = None

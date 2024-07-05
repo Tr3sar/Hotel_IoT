@@ -41,5 +41,5 @@ def update_room_status(room_number: int, request: schemas.UpdateRoomStatusReques
     return storage.update_room_status(db=db, room_number=room_number, status=request.status)
 
 @router.put("/{room_id}/devices")
-def update_room_devices(room_id: int, request: schemas.AdjustEnvironmentRequest, storage: storage_module.Storage = Depends(get_storage)):
-    return storage.update_room_devices(room_id=room_id, temperature=request.temperature, lighting_intensity=request.lighting_intensity)
+def update_room_devices(room_id: int, request: schemas.AdjustEnvironmentRequest, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
+    return storage.update_room_devices(db, room_id=room_id, temperature=request.temperature, lighting_intensity=request.lighting_intensity)

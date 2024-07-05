@@ -77,7 +77,7 @@ class Storage:
         #Revisar
         reservations = db.query(models.Reservation).all()
         for reservation in reservations:
-            self.clients[reservation.client_id].make_reservation(reservation.id, reservation.reservation_type, reservation.start_date)
+            self.clients[reservation.client_id].make_reservation(reservation.reservation_type, reservation.start_date)
 
     #Hotel
     def notify_event(self, event_info: str):
@@ -312,6 +312,12 @@ class Storage:
             raise ValueError("Client not found")
         client.order_restaurant(order_details)
     
+    def make_reservation(self, client_id: int, reservation: schemas.ReservationCreate):
+        smart_client = self.clients.get(client_id)
+        if not smart_client:
+            raise ValueError("Client not found")
+        smart_client.make_reservation(reservation.reservation_type, reservation.start_date)
+
     #Cleaning staff
 
     def get_cleaning_staff(self, staff_id: int):
@@ -372,17 +378,15 @@ class Storage:
             if reservation.reservation_type not in ["restaurant", "spa"]:
                 raise HTTPException(status_code=400, detail="Invalid reservation type")
             
+            smart_client = self.clients.get(reservation.client_id)
+            if not smart_client:
+                raise HTTPException(status_code=404, detail="Client not found")
+            
             db_reservation = models.Reservation(client_id=reservation.client_id, reservation_type=reservation.reservation_type, start_date=reservation.start_date)
             db.add(db_reservation)
             db.commit()
             db.refresh(db_reservation)
             self.reservations[db_reservation.id] = db_reservation
-            
-            smart_client = self.clients.get(reservation.client_id)
-            if not smart_client:
-                raise HTTPException(status_code=404, detail="Client not found")
-        
-            smart_client.make_reservation(db_reservation.id, reservation.reservation_type, reservation.start_date)
 
             return db_reservation
         except IntegrityError as e:

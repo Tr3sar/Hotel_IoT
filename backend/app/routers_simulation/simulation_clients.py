@@ -22,7 +22,7 @@ def request_cleaning(client_id: int, storage: storage_module.Storage = Depends(g
 
 @router.put("/{client_id}/reservation")
 def reservation(client_id: int, reservation: schemas.ReservationCreate, storage: storage_module.Storage = Depends(get_storage)):
-    return storage.create_reservation(client_id=client_id, reservation=reservation)
+    return storage.make_reservation(client_id, reservation=reservation)
 
 @router.post("/{client_id}/order_restaurant")
 def order_restaurant(client_id: int, request: schemas.OrderRestaurantRequest, storage: storage_module.Storage = Depends(get_storage)):

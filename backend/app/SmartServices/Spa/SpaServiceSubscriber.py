@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 import json
 
 import logging
-logger = logging.getLogger('Services')
+logger = logging.getLogger('SmartServices')
 
 class SpaServiceSubscriber:
     def __init__(self, spa, broker, port):
@@ -35,5 +35,6 @@ class SpaServiceSubscriber:
         
         client_id = data["client_id"]
         start_date = data["start_date"]
-        #Fer la reserva també a través de mqtt? A part de la bd? En cas que si, tornar a posar l'atribut reservation_id
+        
         logger.info(f"New reservation: Client {client_id} at {start_date}")
+        self.spa.book_apointment(client_id, start_date)

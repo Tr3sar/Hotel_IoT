@@ -11,7 +11,7 @@
 
         <mat-form-field>
             <mat-label>Date</mat-label>
-            <input matInput type="datetime-local" [(ngModel)]="datetime">
+            <input matInput type="datetime-local" [(ngModel)]="datetime" (change)="onDateChange($event)">
         </mat-form-field>
     </div>
 

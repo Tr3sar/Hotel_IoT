@@ -72,7 +72,7 @@ class SmartClient():
         self.notifier.notify_cleaning_request(self.room_number)
         print(f"Client {self.name} requested cleaning for room {self.room_number}")
 
-    def make_reservation(self, reservation_id, reservation_type, start_Date):
+    def make_reservation(self, reservation_type, start_Date):
         self.notifier.notify_reservation(self.client_id, reservation_type, start_Date)
 
     #TODO: Implementar estos mètodes

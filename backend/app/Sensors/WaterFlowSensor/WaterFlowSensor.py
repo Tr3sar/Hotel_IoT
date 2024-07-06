@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class WaterFlowSensor():
+    #Sensor YF-S201
     def __init__(self, room_id):
         self.sensor_id = room_id
         self.flow_rate = 0

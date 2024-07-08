@@ -8,10 +8,11 @@ import { CleaningStaff } from '../models/cleaning_staff.model';
 })
 export class CleaningStaffService {
   private apiUrl = 'http://localhost:8000/cleaning_staff';
+  private simulateApiUrl = 'http://localhost:8000/simulation/cleaning_staff';
 
   constructor(private http: HttpClient) { }
 
-  getCleaningStaff(): Observable<any> {
+  getCleaningStaff(): Observable<CleaningStaff[]> {
     return this.http.get<any>(this.apiUrl);
   }
 
@@ -20,14 +21,14 @@ export class CleaningStaffService {
   }
 
   startShift(cleaningStaffId: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${cleaningStaffId}/start_shift`, {});
+    return this.http.put(`${this.simulateApiUrl}/${cleaningStaffId}/start-shift`, {});
   }
 
   endShift(cleaningStaffId: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${cleaningStaffId}/end_shift`, {});
+    return this.http.put(`${this.simulateApiUrl}/${cleaningStaffId}/end-shift`, {});
   }
 
   completeTask(cleaningStaffId: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${cleaningStaffId}/complete_task`, {});
+    return this.http.put(`${this.simulateApiUrl}/${cleaningStaffId}/complete-task`, {});
   }
 }

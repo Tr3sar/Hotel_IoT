@@ -23,7 +23,7 @@ def end_shift(staff_id: int, storage: storage_module.Storage = Depends(get_stora
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-@router.put("/{staff_id}/complete_task")
+@router.put("/{staff_id}/complete-task")
 def complete_task(staff_id: int, storage: storage_module.Storage = Depends(get_storage)):
     try:
         cleaning_staff = storage.complete_task(staff_id=staff_id)

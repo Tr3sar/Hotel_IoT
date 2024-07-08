@@ -320,7 +320,10 @@ class Storage:
 
     #Cleaning staff
 
-    def get_cleaning_staff(self, staff_id: int):
+    def get_cleaning_staff(self, db: Session, skip: int = 0, limit: int = 10):
+        return db.query(models.CleaningStaff).offset(skip).limit(limit).all()
+    
+    def get_cleaning_staff_by_id(self, staff_id: int):
         return self.cleaning_staff.get(staff_id)
 
     def create_cleaning_staff(self, db: Session, staff: schemas.CleaningStaffCreate):

@@ -1,6 +1,11 @@
 <main>
     <mat-sidenav-container class="sidenav-container">
-        <mat-sidenav mode="side" opened>Sidenav content</mat-sidenav>
-        <mat-sidenav-content><app-dashboard/></mat-sidenav-content>
+        <mat-sidenav mode="side" opened class="sidenav">
+            <div class="router-container">
+                <button mat-button routerLink="dashboard">Dashboard</button>
+                <button mat-button routerLink="staff">Staff</button>
+            </div>
+        </mat-sidenav>
+        <mat-sidenav-content><router-outlet/></mat-sidenav-content>
     </mat-sidenav-container>
 </main>

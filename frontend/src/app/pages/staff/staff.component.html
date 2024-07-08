@@ -1,0 +1,26 @@
+<main>
+    <p><b>Staff</b></p>
+    <ng-container>
+        Cleaning Staff
+
+        <div class="items-container">
+            <div *ngFor="let staff of cleaning_staff" class="item">
+                <div class="item-content">
+                    <span class="text">{{staff.name}}</span>
+                    <mat-icon [matMenuTriggerFor]="menuRooms" class="menu_button">more_vert</mat-icon>
+                    
+                    <span 
+                    [ngStyle]="{'background-color': staff.working ? 'green' : 'red'}" class="active"
+                    [matTooltip]="staff.working ? 'Activo' : 'No activo'">
+                    </span>
+                </div>
+    
+                <mat-menu #menuRooms="matMenu">
+                    <button mat-menu-item (click)="startShift(staff)">Start shift</button>
+                    <button mat-menu-item (click)="endShift(staff)">End shift</button>
+                    <button mat-menu-item (click)="completeTask(staff)">Complete task</button>
+                </mat-menu>
+            </div>
+        </div>
+    </ng-container>
+</main>

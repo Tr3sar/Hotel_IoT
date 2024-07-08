@@ -5,4 +5,20 @@
     left: 0;
     right: 0;
     background: #eee;
+
+    .sidenav{
+        width: 10rem;
+
+        .router-container{
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+
+            margin-top: 2rem;
+
+            button{
+                margin-bottom: 0.5rem;
+            }
+        }
+    }
 }

@@ -27,30 +27,30 @@ class CleaningStaff:
 
     def start_shift(self):
         self.working = True
-        self.notifier.notify_shift('start')
-
         url = os.getenv("API_URL") + f"/cleaning_staff/{self.staff_id}"
-        put_payload = f'{{"id":"{self.staff_id}", "name":"{self.name}", working":"{self.working}"}}'
+        put_payload = {"id":self.staff_id, "name":self.name, "working":self.working}
         headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",
         "Accept-Language": "es",
         }
-        response = requests.put(url, headers=headers, data=put_payload)
+        response = requests.put(url, headers=headers, json=put_payload)
 
-    def end_shift(self):
+    def end_shift(self):   
         #Decidir que fer si encara hi ha tasques pendents de completar
         self.working = False
         self.notifier.notify_shift('end')
-        
+
+        print('en el método end_shift')     
+
         url = os.getenv("API_URL") + f"/cleaning_staff/{self.staff_id}"
-        put_payload = f'{{"id":"{self.staff_id}", "name":"{self.name}", working":"{self.working}"}}'
+        put_payload = {"id": self.staff_id, "name":self.name, "working":self.working}
         headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",
         "Accept-Language": "es",
         }
-        response = requests.put(url, headers=headers, data=put_payload)
+        response = requests.put(url, headers=headers, json=put_payload)
 
     def assign_task(self, room_number):
         if self.working:

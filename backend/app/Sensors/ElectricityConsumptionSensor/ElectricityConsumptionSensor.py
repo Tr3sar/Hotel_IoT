@@ -28,14 +28,14 @@ class ElectricityConsumptionSensor():
     
     def read_voltage(self):
         # Simular la lectura de la tensió generant valors al·leatoris
-        # El sensor SCT013 produeix una senyal d'eixida proporcional a la corrent mesurada
-        self.voltage = random.uniform(0.0, 1.0)  # Simulació de senyal analògica en volts (0-1V)
+        # El sensor SCT-013-030 produeix una senyal d'eixida proporcional a la corrent mesurada
+        self.voltage = random.uniform(0.0, 3.0)  # Simulació de senyal analògica en volts (0-3V)
         return self.voltage
 
     def convert_to_current(self):
         # Convertir la senyal analògica a corrent
-        # Suposem un factor de conversió de 100A per 1V d'eixida
-        self.current = self.voltage * 100
+        # Suposem un factor de conversió de 30A per 1V d'eixida
+        self.current = self.voltage * 30
         self.consumption_data += self.current
         return self.current
     

@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class SmokeSensor():
+    #MQ-2
     def __init__(self, room_number):
         self.sensor_id = room_number
         self.smoke_level = 0
@@ -21,13 +22,13 @@ class SmokeSensor():
 
     def read_smoke_level(self):
         if self.smoke_detected:
-            self.smoke_level = random.uniform(51, 100)
+            self.smoke_level = random.uniform(301, 1000)
         else:
-            self.smoke_level = random.uniform(0, 49)
+            self.smoke_level = random.uniform(0, 299)
         return self.smoke_level
 
     def check_for_smoke(self):
-        THRESHOLD = 50.0
+        THRESHOLD = 300.0
         if self.smoke_level > THRESHOLD:
             self.notifier.notify_smoke_detected(self.sensor_id, self.smoke_level)
             time.sleep(5)

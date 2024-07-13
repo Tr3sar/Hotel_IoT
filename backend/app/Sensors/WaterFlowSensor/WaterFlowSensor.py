@@ -28,9 +28,9 @@ class WaterFlowSensor():
 
     def read_flow_rate(self):
         # Simular la lectura del caudal d'aigua generant pols aleatoris
-        pulses = random.randint(10, 450)
-        # Convertir els pols a litres per minut (1 pols = 1/450 litre)
-        self.flow_rate = pulses / 450.0
+        pulses = random.randint(8, 225) #225 = 30 * 7.5
+        # Convertir els pols a litres per minut (1 pols = 1/7.5 l/m)
+        self.flow_rate = pulses / 7.5
         self.flow_rate_sum += self.flow_rate
         return self.flow_rate
     

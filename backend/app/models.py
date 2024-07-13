@@ -7,6 +7,7 @@ class Room(Base):
     id = Column(Integer, primary_key=True, index=True)
     number = Column(Integer, unique=True, index=True)
     status = Column(String(50), default="clean")
+    price = Column(Float, default=0.0)
 
 class Client(Base):
     __tablename__ = "clients"

@@ -5,6 +5,10 @@ from app.routers_simulation import simulation_rooms, simulation_clients, simulat
 from app.database import engine, Base, SessionLocal
 from app.storage import Storage
 
+import threading
+import time
+import requests
+
 import logging
 from colorlog import ColoredFormatter
 
@@ -69,13 +73,6 @@ def setup_logging():
     create_colored_logger('Staff', log_colors['Staff'])
     create_colored_logger(__name__, 'bold_white')
 
-setup_logging()
-logger = logging.getLogger(__name__)
-logger.info("Starting the application")
-
-load_data()
-
-
 app = FastAPI()
 
 origins = [
@@ -105,3 +102,10 @@ app.include_router(simulation_rooms.router, prefix="/simulation/rooms", dependen
 app.include_router(simulation_clients.router, prefix="/simulation/clients", dependencies=[Depends(get_storage)])
 app.include_router(simulation_cleaning_staff.router, prefix="/simulation/cleaning_staff", dependencies=[Depends(get_storage)])
 app.include_router(simulation_hotel.router, prefix="/simulation/hotel", dependencies=[Depends(get_storage)])
+
+setup_logging()
+logger = logging.getLogger(__name__)
+logger.info("Starting the application")
+
+load_data_thread = threading.Thread(target=load_data)
+load_data_thread.start()

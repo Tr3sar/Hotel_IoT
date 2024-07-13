@@ -5,6 +5,7 @@ from typing import List, Optional
 class RoomBase(BaseModel):
     number: int
     status: str
+    price: float
 
 class RoomCreate(RoomBase):
     pass

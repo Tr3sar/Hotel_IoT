@@ -70,3 +70,17 @@ class WaterConsumption(Base):
     room_id = Column(Integer, ForeignKey("rooms.id"))
     timestamp = Column(DateTime)
     consumption = Column(Float)
+
+class Task(Base):
+    __tablename__ = "tasks"
+    id = Column(Integer, primary_key=True, index=True)
+    cleaning_staff_id = Column(Integer, ForeignKey("cleaning_staff.id"), nullable=False)
+    room_id = Column(Integer, ForeignKey("rooms.id"), nullable=False)
+    task_status = Column(String(50), default="pending")
+    assigned_at = Column(DateTime)
+
+    cleaning_staff = relationship("CleaningStaff", back_populates="tasks")
+    room = relationship("Room", back_populates="tasks")
+
+CleaningStaff.tasks = relationship("Task", order_by=Task.id, back_populates="cleaning_staff")
+Room.tasks = relationship("Task", order_by=Task.id, back_populates="room")

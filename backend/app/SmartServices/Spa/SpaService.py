@@ -20,7 +20,7 @@ class SpaService:
             url = os.getenv("API_URL") + f"/reservations"
             post_payload = {
                 "client_id": client_id,
-                "reservation_type": "spa",
+                "type": "spa",
                 "start_date": time,
             }
             headers = {
@@ -49,6 +49,6 @@ class SpaService:
         if response.status_code == 200:
             data = response.json()
             for appointment in data:
-                if appointment['client_id'] == client_id and appointment['start_date'] == time and appointment['reservation_type'] == 'spa':
+                if appointment['client_id'] == client_id and appointment['start_date'] == time and appointment['type'] == 'spa':
                     return True, appointment
         return False, None

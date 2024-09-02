@@ -32,7 +32,7 @@ def get_room(room_id: int, storage: storage_module.Storage = Depends(get_storage
     return room
 
 @router.get("/", response_model=List[schemas.Room])
-def get_rooms(db: Session = Depends(get_db), skip: int = 0, limit: int = 10, storage: storage_module.Storage = Depends(get_storage)):
+def get_rooms(db: Session = Depends(get_db), skip: int = 0, limit: int = 50, storage: storage_module.Storage = Depends(get_storage)):
     rooms = storage.get_rooms(db, skip=skip, limit=limit)
     return rooms
 

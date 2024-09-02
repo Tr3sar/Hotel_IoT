@@ -8,7 +8,7 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 })
 export class RoomAssignmentService {
 
-  private apiUrl = 'http://localhost:8000/room_assignment';
+  private apiUrl = 'http://localhost:8000/room_assignments';
 
   constructor(private http: HttpClient) { }
 

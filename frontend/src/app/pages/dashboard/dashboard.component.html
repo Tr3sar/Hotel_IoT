@@ -7,7 +7,7 @@
 
     <ng-container *ngIf="viewRooms">
         <p>Habitacions</p>
-        <div class="items-container">
+        <div class="items-container items-container-rooms">
             <div *ngFor="let room of rooms" class="item">
                 <div class="item-content">
                     <span class="text">{{room.number}}</span>
@@ -15,12 +15,12 @@
                 </div>                
                 
                 <span *ngIf="isRoomOccupied(room.id)" style="width: 100%;">
-                    <mat-icon class="icon" [matTooltip]="getClientByRoomId(room.id)!.name">person</mat-icon>
+                    <mat-icon class="icon" [matTooltip]="getClientByRoomId(room.id)!.first_name">person</mat-icon>
                 </span>
 
                 <mat-menu #menuRooms="matMenu">
                     <button mat-menu-item (click)="openDialog('adjust_environment', {'room_id': room.id, 'room_number': room.number})">Adjust environment</button>
-                    <button mat-menu-item (click)="simulateFire()">Simulate fire</button>
+                    <button mat-menu-item (click)="simulateFire(room.id)">Simulate fire</button>
                 </mat-menu>
             </div>
         </div>
@@ -28,10 +28,10 @@
 
     <ng-container *ngIf="!viewRooms">
         <p>Clients</p>
-        <div class="items-container">
+        <div class="items-container items-container-clients">
             <div *ngFor="let client of clients" class="item">
                 <div class="item-content">
-                    <span class="text">{{client.name}}</span>
+                    <span class="text">{{client.first_name}}</span>
                     <mat-icon class="menu_button" [matMenuTriggerFor]="menuClients">more_vert</mat-icon>
                 </div>
 

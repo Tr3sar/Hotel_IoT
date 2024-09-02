@@ -14,6 +14,7 @@ class CleaningStaff:
     def __init__(self, staff_id, name, working):
         self.staff_id = staff_id
         self.name = name
+        self.role = "cleaning"
         self.working = working
         self.current_tasks = []
         self.notifier = CleaningStaffNotifier(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
@@ -27,7 +28,8 @@ class CleaningStaff:
 
     def start_shift(self):
         self.working = True
-        url = os.getenv("API_URL") + f"/cleaning_staff/{self.staff_id}"
+        self.notifier.notify_shift('start')
+        url = os.getenv("API_URL") + f"/staff/{self.staff_id}/shift"
         put_payload = {"id":self.staff_id, "name":self.name, "working":self.working}
         headers = {
         "Content-Type": "application/json",
@@ -36,14 +38,11 @@ class CleaningStaff:
         }
         response = requests.put(url, headers=headers, json=put_payload)
 
-    def end_shift(self):   
-        #Decidir que fer si encara hi ha tasques pendents de completar
+    def end_shift(self):
         self.working = False
-        self.notifier.notify_shift('end')
+        self.notifier.notify_shift('end')   
 
-        print('en el método end_shift')     
-
-        url = os.getenv("API_URL") + f"/cleaning_staff/{self.staff_id}"
+        url = os.getenv("API_URL") + f"/staff/{self.staff_id}/shift"
         put_payload = {"id": self.staff_id, "name":self.name, "working":self.working}
         headers = {
         "Content-Type": "application/json",

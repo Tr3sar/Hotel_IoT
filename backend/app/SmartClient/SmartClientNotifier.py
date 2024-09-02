@@ -52,9 +52,14 @@ class SmartClientNotifier:
         self.client.publish(f"hotel/rooms/{room_number}/status", json.dumps(payload))
         logger.info(f"Cleaning request notification sent for room {room_number}")
         
-    def notify_reservation(self, client_id, reservation_type, start_date):
-        payload = {"client_id": client_id, "reservation_type": reservation_type, "start_date": start_date.isoformat()}
+    def notify_reservation(self, client_id, type, start_date):
+        payload = {"client_id": client_id, "type": type, "start_date": start_date.isoformat()}
         self.client.publish(f"hotel/clients/{client_id}/reservations", json.dumps(payload))
-        logger.info(f"Reservation notification sent for client: {client_id} for the service: {reservation_type} at {start_date}")
+        logger.info(f"Reservation notification sent for client: {client_id} for the service: {type} at {start_date}")
+
+    def notify_order(self, client_id, order_details):
+        payload = {"client_id": client_id, "order_details": order_details}
+        self.client.publish(f"hotel/clients/{client_id}/orders", json.dumps(payload))
+        logger.info(f"Order notification sent for client: {client_id} with details: {order_details}")
 
     

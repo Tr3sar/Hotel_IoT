@@ -25,7 +25,7 @@ class SmartHotelSubscriber:
         self.client.subscribe("hotel/rooms/+/status")
         self.client.subscribe("hotel/rooms/+/fire")
         self.client.subscribe("hotel/staff/cleanliness/+/tasks")
-        self.client.subscribe("hotel/staff/cleanliness/+/shift")
+        self.client.subscribe("hotel/staff/+/shift")
     
     def on_message(self, client, userdata, msg):
         data = json.loads(msg.payload.decode())
@@ -60,17 +60,17 @@ class SmartHotelSubscriber:
     def handle_shift(self, data):
         status = data["status"]
         staff_id = data["staff_id"]
+        role = data["role"]
 
         if status == 'start':
-            self.hotel.add_active_cleaning_staff(staff_id)
+            self.hotel.add_active_staff(staff_id, role)
         elif status == 'end':
-            self.hotel.remove_active_cleaning_staff(staff_id)
+            self.hotel.remove_active_staff(staff_id, role)
 
     def handle_fire_alarm(self, data):
         room_number = data["room_number"]
         smoke_level = data["smoke_level"]
 
-        #Notificar a qui ????
-        #self.hotel.notify_fire_alarm(room_number, smoke_level)
+        self.hotel.notify_smoke_alarm(room_number, smoke_level)
         
         logger.info(f"Fire alarm notification sent for room {room_number} with smoke level {smoke_level}")

@@ -23,15 +23,19 @@ class RestaurantServiceSubscriber:
     def on_connect(self, client, userdata, flags, rc, properties = None):
         logger.info(f"Restaurant Service Subscriber: Connected to broker with result code {rc}")
         self.client.subscribe("hotel/clients/+/reservations")
+        self.client.subscribe("hotel/clients/+/orders")
 
     def on_message(self, client, userdata, msg):
         data = json.loads(msg.payload.decode())
 
-        self.handle_reservation(data)
+        if "reservations" in msg.topic:
+            self.handle_reservation(data)
+        elif "orders" in msg.topic:
+            self.handle_order(data)
 
     def handle_reservation(self, data):
-        reservation_type = data["reservation_type"]
-        if reservation_type != "restaurant":
+        type = data["type"]
+        if type != "restaurant":
             return
         
         client_id = data["client_id"]
@@ -40,3 +44,9 @@ class RestaurantServiceSubscriber:
         logger.info(f"New restaurant reservation: Client {client_id} at {start_date}")
 
         self.restaurant.make_reservation(client_id, start_date)
+    
+    def handle_order(self, data):
+        client_id = data["client_id"]
+        order_details = data["order_details"]
+
+        logger.info(f"New restaurant order: Client {client_id} ordered {order_details}")

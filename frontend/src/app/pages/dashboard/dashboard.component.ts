@@ -43,7 +43,7 @@ export class DashboardComponent implements OnInit {
     });
 
     this.roomAssignmentService.getRoomAssignments().subscribe((roomAssignments: RoomAssignment[]) => {
-      this.roomAssignments = roomAssignments;
+      this.roomAssignments = roomAssignments.filter((roomAssignment: RoomAssignment) => roomAssignment.check_out_date == null);
       console.table(this.roomAssignments);
     });
   }
@@ -70,8 +70,10 @@ export class DashboardComponent implements OnInit {
     return this.rooms.find((room: Room) => room.id === roomAssignment!.room_id);
   }
 
-  simulateFire(): void {
-    console.warn('TODO: Implement simulateFire() method');
+  simulateFire(roomId: number): void {
+    this.roomService.simulateFire(roomId).subscribe(
+      
+    );
   }
 
   checkout(client_id: number): void {
@@ -102,7 +104,18 @@ export class DashboardComponent implements OnInit {
           let roomId = this.rooms.find((room: Room) => room.number == result.room_number)!.id;
           let lastAssignment = this.roomAssignments[this.roomAssignments.length - 1];
           let lastAssignmentId = lastAssignment ? lastAssignment.id : 0;
-          let roomAssignment = {'client_id': result.client_id, 'room_id': roomId, 'rfid_code': result.rfid_code, 'expense': 0, id: lastAssignmentId + 1 || 1}
+          const now = new Date();
+    
+          const year = now.getFullYear();
+          const month = String(now.getMonth() + 1).padStart(2, '0');
+          const day = String(now.getDate()).padStart(2, '0');
+
+          const hours = String(now.getHours()).padStart(2, '0');
+          const minutes = String(now.getMinutes()).padStart(2, '0');
+          const seconds = String(now.getSeconds()).padStart(2, '0');
+
+          const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+          let roomAssignment = {'client_id': result.client_id, 'room_id': roomId, 'rfid_code': result.rfid_code, 'expense': 0, 'check_in_date': formattedDateTime, 'check_out_date': null, id: lastAssignmentId + 1 || 1}
           this.roomAssignments.push(roomAssignment);
         });
         break;

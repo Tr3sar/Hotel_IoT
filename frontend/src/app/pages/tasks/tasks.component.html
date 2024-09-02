@@ -1,0 +1,21 @@
+<main>
+    <p><b><u>Tasks</u></b></p>
+    {{staff_member.name}}
+
+    <div class="items-container">
+        <div *ngFor="let task of tasksNotCompleted" class="item">
+            <div class="item-content">
+                <span class="text">Room: {{task.room.number}}</span>
+                <div class="status-container">
+                    <span class="status">{{task.task_status}}</span>
+                </div>
+                <mat-icon [matMenuTriggerFor]="menuTasks" class="menu_button">more_vert</mat-icon>
+            </div>   
+            
+            <mat-menu #menuTasks="matMenu">
+                <button mat-menu-item (click)="startTask(task)">Start  task</button>
+                <button mat-menu-item (click)="completeTask(task)">Complete task</button>
+            </mat-menu>
+        </div>
+    </div>
+</main>

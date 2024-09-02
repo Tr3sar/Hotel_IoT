@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import rooms, clients, cleaning_staff, reservations, room_assignment
-from app.routers_simulation import simulation_rooms, simulation_clients, simulation_cleaning_staff, simulation_hotel
+from app.routers import rooms, clients, reservations, room_assignment, staff, tasks
+from app.routers_simulation import simulation_rooms, simulation_clients, simulation_hotel, simulation_staff
 from app.database import engine, Base, SessionLocal
 from app.storage import Storage
 
@@ -20,6 +20,7 @@ def load_data():
     db = SessionLocal()
     try:
         storage.load_from_db(db)
+        #storage.populate_db(db)
     finally:
         db.close()
 
@@ -94,13 +95,14 @@ def get_storage():
 
 app.include_router(rooms.router, prefix="/rooms", dependencies=[Depends(get_storage)])
 app.include_router(clients.router, prefix="/clients", dependencies=[Depends(get_storage)])
-app.include_router(cleaning_staff.router, prefix="/cleaning_staff", dependencies=[Depends(get_storage)])
+app.include_router(staff.router, prefix="/staff", dependencies=[Depends(get_storage)])
 app.include_router(reservations.router, prefix="/reservations", dependencies=[Depends(get_storage)])
-app.include_router(room_assignment.router, prefix="/room_assignment", dependencies=[Depends(get_storage)])
+app.include_router(room_assignment.router, prefix="/room_assignments", dependencies=[Depends(get_storage)])
+app.include_router(tasks.router, prefix="/tasks", dependencies=[Depends(get_storage)])
 
 app.include_router(simulation_rooms.router, prefix="/simulation/rooms", dependencies=[Depends(get_storage)])
 app.include_router(simulation_clients.router, prefix="/simulation/clients", dependencies=[Depends(get_storage)])
-app.include_router(simulation_cleaning_staff.router, prefix="/simulation/cleaning_staff", dependencies=[Depends(get_storage)])
+app.include_router(simulation_staff.router, prefix="/simulation/staff", dependencies=[Depends(get_storage)])
 app.include_router(simulation_hotel.router, prefix="/simulation/hotel", dependencies=[Depends(get_storage)])
 
 setup_logging()

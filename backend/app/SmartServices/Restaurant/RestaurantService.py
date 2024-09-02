@@ -20,7 +20,7 @@ class RestaurantService:
             url = os.getenv("API_URL") + f"/reservations"
             post_payload = {
                 "client_id": client_id,
-                "reservation_type": "restaurant",
+                "type": "restaurant",
                 "start_date": time,
             }
             headers = {
@@ -49,6 +49,6 @@ class RestaurantService:
         if response.status_code == 200:
             data = response.json()
             for reservation in data:
-                if reservation['client_id'] == client_id and reservation['start_date'] == time and reservation['reservation_type'] == 'restaurant':
+                if reservation['client_id'] == client_id and reservation['start_date'] == time and reservation['type'] == 'restaurant':
                     return True, reservation
         return False, None

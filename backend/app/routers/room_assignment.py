@@ -39,3 +39,10 @@ def delete_room_assignment(room_assignment_id: int, db: Session = Depends(get_db
     if room_assignment is None:
         raise HTTPException(status_code=404, detail="Room assignment not found")
     return room_assignment
+
+@router.put("/{room_assignment_id}/checkout", response_model=schemas.RoomAssignment)
+def update_check_out_time(room_assignment_id: int, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
+    room_assignment = storage.update_check_out_time(db, room_assignment_id)
+    if not room_assignment:
+        raise HTTPException(status_code=404, detail="Room assignment not found")
+    return room_assignment

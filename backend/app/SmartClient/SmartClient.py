@@ -6,9 +6,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class SmartClient():
-    def __init__(self, client_id, name, email):
+    def __init__(self, client_id, first_name, last_name ,email):
         self.client_id = client_id
-        self.name = name
+        self.first_name = first_name
+        self.last_name = last_name
         self.email = email
         self.rfid_code = None
         self.room_number = None
@@ -19,8 +20,11 @@ class SmartClient():
     def getClientId(self):
         return self.client_id
 
-    def getName(self):
-        return self.name
+    def getFirstName(self):
+        return self.first_name
+
+    def getLastName(self):
+        return self.last_name
 
     def getRfidCode(self):
         return self.rfid_code
@@ -33,9 +37,11 @@ class SmartClient():
             print(f"Client {self.client_id} changed RFID code from {self.rfid_code} to {rfid_code}")
         self.rfid_code = rfid_code
 
-    def setName(self, name):
-        print(f"Client {self.client_id} changed name from {self.name} to {name}")
-        self.name = name
+    def setFirstName(self, first_name):
+        self.first_name = first_name
+
+    def setLastName(self, last_name):
+        self.last_name = last_name
     
     def setRoom(self, room_number):
         if self.room_number:
@@ -52,10 +58,8 @@ class SmartClient():
             raise Exception(f"Client {self.client_id} is already checked in to room {self.room_number}")
         self.setRfidCode(rfid_code)
         self.setRoom(room)
-        print(f"Client {self.name} checked in with RFID {rfid_code} in room {self.room_number}")
 
     def checkout(self):
-        print(f"Client {self.name} checked out from room {self.room_number}")
         self.notifier.notify_checkout(self.client_id, self.room_number)
         self.rfid_code = None
         self.room_number = None
@@ -64,18 +68,19 @@ class SmartClient():
         if not self.room_number:
             raise Exception(f"Client {self.client_id} is not checked in to any room")
         self.notifier.notify_adjust_environment(self.room_number, temperature, lighting_intensity)
-        print(f"Client {self.name} adjusted environment in room {self.room_number} to temperature {temperature} and lighting intensity {lighting_intensity}")
-
+        
     def requestRoomCleaning(self):
         if not self.room_number:
             raise Exception(f"Client {self.client_id} is not checked in to any room")
         self.notifier.notify_cleaning_request(self.room_number)
-        print(f"Client {self.name} requested cleaning for room {self.room_number}")
 
-    def make_reservation(self, reservation_type, start_Date):
-        self.notifier.notify_reservation(self.client_id, reservation_type, start_Date)
+    def make_reservation(self, type, start_Date):
+        self.notifier.notify_reservation(self.client_id, type, start_Date)
+    
+    def order_restaurant(self, order_details):
+        self.notifier.notify_order_restaurant(self.client_id, order_details)
 
-    #TODO: Implementar estos mètodes
+    #TODO: Implementar estos mètodes ?
     def authenticate_rfid(self, rfid_code):
         if self.rfid_code == rfid_code:
             print(f"Client {self.client_id} authenticated with RFID code {rfid_code}")

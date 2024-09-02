@@ -29,12 +29,12 @@ class SpaServiceSubscriber:
         self.handle_reservation(data)
 
     def handle_reservation(self, data):
-        reservation_type = data["reservation_type"]
-        if reservation_type != "spa":
+        type = data["type"]
+        if type != "spa":
             return
         
         client_id = data["client_id"]
         start_date = data["start_date"]
         
         logger.info(f"New reservation: Client {client_id} at {start_date}")
-        self.spa.book_apointment(client_id, start_date)
+        self.spa.book_appointment(client_id, start_date)

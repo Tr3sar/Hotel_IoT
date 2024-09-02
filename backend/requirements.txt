@@ -9,3 +9,4 @@ paho-mqtt
 requests
 colorlog
 schedule
+faker

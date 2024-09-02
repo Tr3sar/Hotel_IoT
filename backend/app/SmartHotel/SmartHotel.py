@@ -10,19 +10,33 @@ class SmartHotel:
         self.cleaning_staff = {}
         self.active_cleaning_staff = set()
 
+        self.security_staff = {}
+        self.active_security_staff = set()
+
         self.notifier = SmartHotelNotifier(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
         self.subscriber = SmartHotelSubscriber(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
     
     def get_active_cleaning_staff(self):
         return self.active_cleaning_staff
-
-    def add_active_cleaning_staff(self, staff_id):
-        self.active_cleaning_staff.add(staff_id)
-        if staff_id not in self.cleaning_staff:
-            self.cleaning_staff[staff_id] = {'tasks': 0}
     
-    def remove_active_cleaning_staff(self, staff_id):
-        self.active_cleaning_staff.discard(staff_id)
+    def get_active_security_staff(self):
+        return self.active_security_staff
+
+    def add_active_staff(self, staff_id, role):
+        if role == "cleaning":
+            self.active_cleaning_staff.add(staff_id)
+            if staff_id not in self.cleaning_staff:
+                self.cleaning_staff[staff_id] = {'tasks': 0}
+        elif role == "security":
+            self.active_security_staff.add(staff_id)
+            if staff_id not in self.security_staff:
+                self.security_staff[staff_id] = {'alerts': 0}
+    
+    def remove_active_staff(self, staff_id, role):
+        if role == "cleaning":
+            self.active_cleaning_staff.discard(staff_id)
+        elif role == "security":
+            self.active_security_staff.discard(staff_id)
     
     def notify_event(self, event):
         self.notifier.notify_event(event)
@@ -40,6 +54,7 @@ class SmartHotel:
     def notify_room_cleaning(self, room_number):
         self.notifier.notify_room_status(room_number, 'cleaning')
     
-    #TODO: fa falta? A qui li avisa?
-    def notify_smoke_alarm(self, room_number):
-        self.notifier.notify_smoke_alarm(room_number)
+    def notify_smoke_alarm(self, room_number, smoke_level):
+        assigned_staff = min((staff_id for staff_id in self.active_security_staff if staff_id in self.security_staff.keys()), key=lambda staff_id: self.security_staff[staff_id]['alerts'])
+        self.security_staff[assigned_staff]['alerts'] += 1
+        self.notifier.notify_smoke_alarm(room_number, assigned_staff, smoke_level)

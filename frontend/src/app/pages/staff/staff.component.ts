@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { CleaningStaffService } from '../../services/cleaning-staff.service';
-import { CleaningStaff } from '../../models/cleaning_staff.model';
+import { StaffService } from '../../services/cleaning-staff.service';
+import { Staff } from '../../models/staff.model';
 
 @Component({
   selector: 'app-staff',
@@ -8,28 +8,45 @@ import { CleaningStaff } from '../../models/cleaning_staff.model';
   styleUrl: './staff.component.scss'
 })
 export class StaffComponent {
-  cleaning_staff: CleaningStaff[] = [];
+  staff: Staff[] = [];
 
-  constructor(private cleaningStaffService: CleaningStaffService) {
-    this.cleaningStaffService.getCleaningStaff().subscribe((data: CleaningStaff[]) => {
-      this.cleaning_staff = data;
+  constructor(private staffService: StaffService) {
+    this.staffService.getStaff().subscribe((data: Staff[]) => {
+      console.table(data);
+      this.staff = data.sort((a, b) => {
+        if (a.role === 'cleaning' && b.role !== 'cleaning') {
+          return -1;
+        } else if (a.role !== 'cleaning' && b.role === 'cleaning') {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
     });
   }
 
-  startShift(staff: CleaningStaff) {
-    this.cleaningStaffService.startShift(staff.id).subscribe(() => {
+  get cleaning_staff() {
+    return this.staff.filter(staff => staff.role === 'cleaning');
+  }
+
+  get security_staff() {
+    return this.staff.filter(staff => staff.role === 'security');
+  }
+
+  startShift(staff: Staff) {
+    this.staffService.startShift(staff.id).subscribe(() => {
       staff.working = true;
     });
   }
 
-  endShift(staff: CleaningStaff) {
-    this.cleaningStaffService.endShift(staff.id).subscribe(() => {
+  endShift(staff: Staff) {
+    this.staffService.endShift(staff.id).subscribe(() => {
       staff.working = false;
     });
   }
 
-  completeTask(staff: CleaningStaff) {
-    this.cleaningStaffService.completeTask(staff.id).subscribe(() => {
+  completeTask(staff: Staff) {
+    this.staffService.completeTask(staff.id).subscribe(() => {
     });
   }
 }

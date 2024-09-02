@@ -8,7 +8,7 @@ import { RoomService } from '../../../services/room.service';
   styleUrl: './adjust-environment-dialog.component.scss'
 })
 export class AdjustEnvironmentDialogComponent {
-  temperature: number = 20;
+  temperature: number = 22;
   lighting_intensity: number = 100;
 
   constructor(

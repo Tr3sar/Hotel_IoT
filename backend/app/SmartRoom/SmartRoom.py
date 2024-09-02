@@ -37,7 +37,7 @@ class SmartRoom():
         return self.occupied_by
     
     def check_room_assignment_exists(self, client_id, room_id, rfid_code):
-        url = os.getenv("API_URL") + f"/room_assignment"
+        url = os.getenv("API_URL") + f"/room_assignments"
         headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
@@ -48,8 +48,9 @@ class SmartRoom():
         if response.status_code == 200:
             data = response.json()
             for assignment in data:
-                if assignment['client_id'] == client_id and assignment['room_id'] == room_id and assignment['rfid_code'] == rfid_code:
-                    return True, assignment
+                if 'client_id' in assignment and 'room_id' in assignment and 'rfid_code' in assignment:
+                    if assignment['client_id'] == client_id and assignment['room_id'] == room_id and assignment['rfid_code'] == rfid_code:
+                        return True, assignment
         return False, None
 
     def adjust_environment(self, temperature, lightning_intensity):
@@ -73,7 +74,7 @@ class SmartRoom():
         else:
 
 
-            url = os.getenv("API_URL") + f"/room_assignment"
+            url = os.getenv("API_URL") + f"/room_assignments"
             post_payload = {
                 "client_id": client_id,
                 "room_id": self.id,
@@ -98,14 +99,14 @@ class SmartRoom():
 
     def vacate(self, client_id):
         if self.occupied_by == client_id and self.assignment_id is not None:
-            url = os.getenv("API_URL") + f"/room_assignment/{self.assignment_id}"
+            url = os.getenv("API_URL") + f"/room_assignments/{self.assignment_id}/checkout"
 
             headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
             "Accept-Language": "es",
             }
-            response = requests.delete(url, headers=headers)
+            response = requests.put(url, headers=headers)
 
             self.occupied_by = None
             self.assignment_id = None

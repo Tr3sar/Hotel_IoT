@@ -22,7 +22,7 @@ def create_reservation(reservation: schemas.ReservationCreate, db: Session = Dep
     return storage.create_reservation(db=db, reservation=reservation)
 
 @router.get("/", response_model=List[schemas.Reservation])
-def get_reservations(skip: int = 0, limit: int = 10, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
+def get_reservations(skip: int = 0, limit: int = 50, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
     return storage.get_reservations(db=db, skip=skip, limit=limit)
 
 @router.get("/{reservation_id}", response_model=schemas.Reservation)

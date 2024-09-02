@@ -37,6 +37,7 @@ export class ClientService {
   }
 
   makeReservation(clientId: number, reservationType: string, datetime: any): Observable<any> {
-    return this.http.put(`${this.simulateApiUrl}/${clientId}/reservation`, { client_id: clientId, reservation_type: reservationType, start_date: datetime })
+    let body = {client_id: clientId, type: reservationType, start_date: datetime, end_date: datetime.setHours(datetime.getHours() + 2), status: 'confirmed', payment_status: 'pending', total_cost: 0}
+    return this.http.put(`${this.simulateApiUrl}/${clientId}/reservation`, body)
   }
 }

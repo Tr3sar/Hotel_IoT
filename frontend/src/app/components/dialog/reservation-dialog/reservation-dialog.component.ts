@@ -12,6 +12,7 @@ export class ReservationDialogComponent {
   reservation_types: string[] = ['restaurant', 'spa'];
   reservation_type: string = 'restaurant';
   datetime: string;
+  details!: string;
 
   constructor(
     private dialogRef: MatDialogRef<ReservationDialogComponent>,
@@ -45,7 +46,7 @@ export class ReservationDialogComponent {
   }
 
   onSave(): void {
-    this.clientService.makeReservation(this.data.client_id, this.reservation_type, this.datetime).subscribe(
+    this.clientService.makeReservation(this.data.client_id, this.reservation_type, this.datetime, this.details).subscribe(
       res => {
         this.dialogRef.close({ res });
       }

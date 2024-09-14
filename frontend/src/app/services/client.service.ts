@@ -36,10 +36,10 @@ export class ClientService {
     return this.http.put(`${this.simulateApiUrl}/${clientId}/order_restaurant`, { order_details })
   }
 
-  makeReservation(clientId: number, reservationType: string, datetime: any): Observable<any> {
+  makeReservation(clientId: number, reservationType: string, datetime: any, details: string): Observable<any> {
     let start_date = new Date(datetime);
     let end_date = start_date.setHours(start_date.getHours() + 2)
-    let body = {client_id: clientId, type: reservationType, start_date: start_date, end_date: end_date, status: 'confirmed', payment_status: 'pending', total_cost: 0}
+    let body = {client_id: clientId, type: reservationType, start_date: start_date, end_date: end_date, status: 'confirmed', payment_status: 'pending', total_cost: 0, special_request: details}
     return this.http.put(`${this.simulateApiUrl}/${clientId}/reservation`, body)
   }
 }

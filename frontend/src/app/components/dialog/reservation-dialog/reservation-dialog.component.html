@@ -13,10 +13,15 @@
             <mat-label>Date</mat-label>
             <input matInput type="datetime-local" [(ngModel)]="datetime" (change)="onDateChange($event)">
         </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Details</mat-label>
+            <textarea matInput [(ngModel)]="details"> </textarea>
+        </mat-form-field>
     </div>
 
     <div mat-dialog-actions>
         <button mat-button (click)="onCancel()">Cancel</button>
         <button mat-button (click)="onSave()">Save</button>
-      </div>
+    </div>
 </main>

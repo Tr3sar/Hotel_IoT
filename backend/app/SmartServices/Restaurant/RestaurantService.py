@@ -3,6 +3,7 @@ from app.SmartServices.Restaurant.RestaurantServiceSubscriber import RestaurantS
 import requests
 import os
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 
 load_dotenv()
 
@@ -18,11 +19,19 @@ class RestaurantService:
             self.reservations.append(reservation_data)
         else:
             url = os.getenv("API_URL") + f"/reservations"
+            start_date = datetime.fromisoformat(time)
+            end_date = start_date + timedelta(hours=2)
+            
             post_payload = {
                 "client_id": client_id,
                 "type": "restaurant",
-                "start_date": time,
+                "start_date": start_date.isoformat(),
+                "end_date": end_date.isoformat(),
+                "status": "confirmed",
+                "payment_status": "pending",
+                "total_cost": 0
             }
+
             headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",

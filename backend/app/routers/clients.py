@@ -22,7 +22,7 @@ def create_client(client: schemas.ClientCreate, db: Session = Depends(get_db), s
     return storage.create_client(db=db, client=client)
 
 @router.get("/", response_model=List[schemas.Client])
-def get_clients(skip: int = 0, limit: int = 10, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
+def get_clients(skip: int = 0, limit: int = 50, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
     clients = storage.get_clients(db, skip=skip, limit=limit)
     return clients
 

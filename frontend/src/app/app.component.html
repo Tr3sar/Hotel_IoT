@@ -4,6 +4,8 @@
             <div class="router-container">
                 <button mat-button routerLink="dashboard">Dashboard</button>
                 <button mat-button routerLink="staff">Staff</button>
+
+                <button mat-button (click)="notifyEvent()" style="margin-top:3rem;">Notify event</button>
             </div>
         </mat-sidenav>
         <mat-sidenav-content><router-outlet/></mat-sidenav-content>

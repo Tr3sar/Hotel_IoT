@@ -29,7 +29,7 @@ def get_staff(staff_id: int, storage: storage_module.Storage = Depends(get_db)):
     return staff
 
 @router.get("/", response_model=List[schemas.Staff])
-def get_staff(skip: int = 0, limit: int = 10, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
+def get_staff(skip: int = 0, limit: int = 50, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
     staff = storage.get_staff(db, skip=skip, limit=limit)
     return staff
 

@@ -78,7 +78,7 @@ class SmartClient():
         self.notifier.notify_reservation(self.client_id, type, start_Date)
     
     def order_restaurant(self, order_details):
-        self.notifier.notify_order_restaurant(self.client_id, order_details)
+        self.notifier.notify_order(self.client_id, order_details)
 
     #TODO: Implementar estos mètodes ?
     def authenticate_rfid(self, rfid_code):

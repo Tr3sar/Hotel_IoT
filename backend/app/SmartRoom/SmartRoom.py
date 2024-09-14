@@ -1,6 +1,6 @@
 from app.SmartRoom.SmartRoomSubscriber import SmartRoomSubscriber
 
-from app.SmartRoom.RoomStatus import RoomStatus
+from app.schemas import RoomStatus
 
 from app.Devices.AC.AC import AC
 from app.Devices.Bulb.Bulb import Bulb
@@ -8,18 +8,19 @@ from app.Sensors.ElectricityConsumptionSensor.ElectricityConsumptionSensor impor
 from app.Sensors.WaterFlowSensor.WaterFlowSensor import WaterFlowSensor
 from app.Sensors.SmokeSensor.SmokeSensor import SmokeSensor
 
+from datetime import datetime
 import requests
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
 class SmartRoom():
-    def __init__(self, id, number):
+    def __init__(self, id, number, status):
         self.id = id
         self.number = number
+        self.status = status
         self.occupied_by = None
         self.assignment_id = None
-        self.status = RoomStatus.CLEAN.value
 
         self.ac = AC(self.number)
         self.bulb = Bulb(self.number)
@@ -72,19 +73,27 @@ class SmartRoom():
         if exists:
             self.assignment_id = assignment_data["id"]
         else:
+            check_in_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+            expense = float(0)
 
+            print('check_in_date', check_in_date)
+            print('expense', expense)
 
             url = os.getenv("API_URL") + f"/room_assignments"
             post_payload = {
                 "client_id": client_id,
                 "room_id": self.id,
-                "rfid_code": rfid_code
+                "rfid_code": rfid_code,
+                "check_in_date": check_in_date,
+                "expense": expense
             }
             headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
             "Accept-Language": "es",
             }
+
+            print('Payload:', post_payload)
             response = requests.post(url, headers=headers, json=post_payload)
 
             print(response.status_code)

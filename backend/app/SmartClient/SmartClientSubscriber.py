@@ -51,10 +51,14 @@ class SmartClientSubscriber:
             self.handle_consumption(data)   
 
     def handle_events_info(self, data):
-        self._debug(f"Received events info: {data}")
+        event_info = data["event"]
+        logger.info(f"Received event info: {event_info}")
+        self._debug(f"(SmartClient: {self.smartClient.getClientId()})Received events info: {data}")
     
     def handle_room_status(self, data):
-        self._debug(f"Received room status: {data}")
+        status = data["status"]
+        #self._debug(f"Received room status: {data}")
     
     def handle_consumption(self, data):
-        self._debug(f"Received consumption: {data}")
+        consumption = data["consumption"]
+        #self._debug(f"Received consumption: {data}")

@@ -85,8 +85,8 @@ export class DashboardComponent implements OnInit {
     this.clientService.checkoutClient(client_id, room_number, rfid_code).subscribe();
   }
 
-  requestCleaning(): void {
-    console.warn('TODO: Implement requestCleaning() method');
+  requestCleaning(clientId: number, roomNumber: number): void {
+    this.clientService.cleaningRequest(clientId, roomNumber).subscribe();
   }
 
   openDialog(type: string, data: any): void {

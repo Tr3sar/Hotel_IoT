@@ -49,7 +49,7 @@ class Storage:
     def save_accumulated_data(self):
         db = SessionLocal()
         try:
-            timestamp = datetime.datetime.now()
+            timestamp = datetime.now()
             for room in self.rooms.values():
                 self.record_light_consumption(db, room.get_number(), room.occupied_by, room.electricity_consumption_sensor.get_consumption_data(), timestamp)
                 self.record_water_consumption(db, room.get_number(), room.occupied_by, room.water_flow_sensor.get_flow_rate_sum(), timestamp)
@@ -62,7 +62,7 @@ class Storage:
     def load_from_db(self, db: Session):
         rooms = db.query(models.Room).all()
         for room in rooms:
-            self.rooms[room.id] = SmartRoom(room.id, room.number)
+            self.rooms[room.id] = SmartRoom(room.id, room.number, room.status)
         
         clients = db.query(models.Client).all()
         for client in clients:
@@ -70,8 +70,9 @@ class Storage:
         
         room_assignments = db.query(models.RoomAssignment).all()
         for assignment in room_assignments:
-            room_number = self.rooms[assignment.room_id].number
-            self.clients[assignment.client_id].checkin(assignment.rfid_code, room_number)
+            if assignment.check_out_date is None:
+                room_number = self.rooms[assignment.room_id].number
+                self.clients[assignment.client_id].checkin(assignment.rfid_code, room_number)
             
         staff = db.query(models.Staff).all()
         for staff_member in staff:
@@ -390,7 +391,7 @@ class Storage:
             raise HTTPException(status_code=404, detail="Client not found")
         
         try:
-            db_assignment = models.RoomAssignment(client_id=db_client.id, room_id=db_room.id, rfid_code=assignment.rfid_code)
+            db_assignment = models.RoomAssignment(client_id=db_client.id, room_id=db_room.id, rfid_code=assignment.rfid_code, check_in_date=assignment.check_in_date, check_out_date=assignment.check_out_date, expense=assignment.expense)
             db.add(db_assignment)
             db.commit()
             db.refresh(db_assignment)
@@ -637,7 +638,10 @@ class Storage:
             if not smart_client:
                 raise HTTPException(status_code=404, detail="Client not found")
             
-            db_reservation = models.Reservation(client_id=reservation.client_id, type=reservation.type, start_date=reservation.start_date)
+            print('creating reservation')
+            
+            db_reservation = models.Reservation(client_id=reservation.client_id, type=reservation.type, start_date=reservation.start_date, end_date=reservation.end_date, status=reservation.status, payment_status=reservation.payment_status, total_cost=reservation.total_cost, special_request=reservation.special_request)
+            print('reservation created')
             db.add(db_reservation)
             db.commit()
             db.refresh(db_reservation)

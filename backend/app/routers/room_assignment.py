@@ -22,7 +22,7 @@ def create_room_assignment(room_assignment: schemas.RoomAssignmentCreate, db: Se
     return storage.create_room_assignment(db=db, assignment=room_assignment)
 
 @router.get("/", response_model=List[schemas.RoomAssignment])
-def get_room_assignments(skip: int = 0, limit: int = 10, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
+def get_room_assignments(skip: int = 0, limit: int = 50, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
     room_assignments = storage.get_room_assignments(db, skip=skip, limit=limit)
     return room_assignments
 

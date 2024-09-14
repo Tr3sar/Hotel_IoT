@@ -49,7 +49,7 @@ class SmartHotel:
     
     def notify_room_cleaned(self, staff_id, room_number):
         self.cleaning_staff[staff_id]['tasks'] -= 1
-        self.notifier.notify_room_status(room_number, 'clean')
+        self.notifier.notify_room_status(room_number, 'CLEAN')
     
     def notify_room_cleaning(self, room_number):
         self.notifier.notify_room_status(room_number, 'cleaning')

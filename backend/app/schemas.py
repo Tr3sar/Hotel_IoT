@@ -14,9 +14,9 @@ class RoomType(str, Enum):
     suite = 'suite'
 
 class RoomStatus(str, Enum):
-    available = 'available'
-    occupied = 'occupied'
-    maintenance = 'maintenance'
+    CLEAN = 'CLEAN'
+    CLEANING = 'CLEANING'
+    CLEAN_REQUIRED = 'CLEAN_REQUIRED'
 
 class ReservationStatus(str, Enum):
     confirmed = 'confirmed'

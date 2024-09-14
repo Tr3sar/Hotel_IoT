@@ -1,7 +1,7 @@
 import paho.mqtt.client as mqtt
 import json
 
-from ..SmartRoom.RoomStatus import RoomStatus
+from app.schemas import RoomStatus
 
 import logging
 logger = logging.getLogger('SmartClient')

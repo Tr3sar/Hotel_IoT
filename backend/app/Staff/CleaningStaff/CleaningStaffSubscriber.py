@@ -32,6 +32,6 @@ class CleaningStaffSubscriber:
     def handle_task(self, data):
         room_number = data["room_number"]
         status = data["status"]
-        if status == "clean-required":    
+        if status == "CLEAN_REQUIRED":    
             self.staff.assign_task(room_number)
             logger.info(f"Task update for staff {self.staff.staff_id} on room {room_number}")

@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
-import { ClientService } from './services/client.service';
-import { RoomService } from './services/room.service';
-import { Client } from './models/client.model';
-import { Room } from './models/room.model';
+import { MatDialog } from '@angular/material/dialog';
+import { NotifyDialogComponent } from './components/dialog/notify-dialog/notify-dialog.component';
 
 @Component({
   selector: 'app-root',
@@ -11,9 +9,13 @@ import { Room } from './models/room.model';
 })
 export class AppComponent {
 
-  constructor(private clientService: ClientService, private roomService: RoomService) {}
+  constructor(private dialog: MatDialog) {}
 
-  ngOnInit() {
-    
+  notifyEvent() {
+    let dialogRef = this.dialog.open(NotifyDialogComponent);
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
   }
 }

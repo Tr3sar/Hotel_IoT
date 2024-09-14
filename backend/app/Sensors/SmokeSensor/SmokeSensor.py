@@ -22,7 +22,7 @@ class SmokeSensor():
 
     def read_smoke_level(self):
         if self.smoke_detected:
-            self.smoke_level = random.uniform(301, 1000)
+            self.smoke_level = random.uniform(301, 10000)
         else:
             self.smoke_level = random.uniform(0, 299)
         return self.smoke_level

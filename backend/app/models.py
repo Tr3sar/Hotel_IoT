@@ -14,9 +14,9 @@ class RoomType(enum.Enum):
     suite = 'suite'
 
 class RoomStatus(enum.Enum):
-    available = 'available'
-    occupied = 'occupied'
-    maintenance = 'maintenance'
+    CLEAN = 'CLEAN'
+    CLEAN_REQUIRED = 'CLEAN_REQUIRED'
+    CLEANING = 'CLEANING'
 
 class ReservationStatus(enum.Enum):
     confirmed = 'confirmed'

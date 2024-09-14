@@ -44,17 +44,17 @@ class SmartHotelSubscriber:
         status = data["status"]
 
         if topic == "status":
-            if status == "clean-required":
+            if status == "CLEAN_REQUIRED":
                 if not self.hotel.get_active_cleaning_staff():
                     logger.warning("No cleaning staff available")
                     return
                 self.hotel.notify_clean_required(room_number)
                 logger.info(f"Room {room_number} requires cleaning")
         elif topic == "tasks":
-            if status == "clean":
+            if status == "CLEAN":
                 staff_id = data["staff_id"]
                 self.hotel.notify_room_cleaned(staff_id, room_number)
-            elif status == "cleaning":
+            elif status == "CLEANING":
                 self.hotel.notify_room_cleaning(room_number)
     
     def handle_shift(self, data):

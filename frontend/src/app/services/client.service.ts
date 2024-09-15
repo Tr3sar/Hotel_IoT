@@ -25,6 +25,7 @@ export class ClientService {
   }
 
   checkoutClient(clientId: number, roomNumber: number, rfidCode: number): Observable<any> {
+    console.table({ room_number: roomNumber, rfid_code: rfidCode })
     return this.http.put(`${this.simulateApiUrl}/${clientId}/check_out`, { room_number: roomNumber, rfid_code: rfidCode})
   }
 
@@ -33,7 +34,7 @@ export class ClientService {
   }
 
   orderRestaurant(clientId: number, order_details: string): Observable<any> {
-    return this.http.put(`${this.simulateApiUrl}/${clientId}/order_restaurant`, { order_details })
+    return this.http.post(`${this.simulateApiUrl}/${clientId}/order_restaurant`, { order_details })
   }
 
   makeReservation(clientId: number, reservationType: string, datetime: any, details: string): Observable<any> {

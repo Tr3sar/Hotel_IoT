@@ -10,14 +10,14 @@
                     
                     <span 
                     [ngStyle]="{'background-color': staff_member.working ? 'green' : 'red'}" class="active"
-                    [matTooltip]="staff_member.working ? 'Trabajando' : 'Descansando'">
+                    [matTooltip]="staff_member.working ? 'Working' : 'Not working'">
                     </span>
                 </div>
     
                 <mat-menu #menuRooms="matMenu">
                     <button mat-menu-item (click)="startShift(staff_member)">Start shift</button>
                     <button mat-menu-item (click)="endShift(staff_member)">End shift</button>
-                    <button mat-menu-item (click)="completeTask(staff_member)">Complete task</button>
+                    <!-- <button mat-menu-item (click)="completeTask(staff_member)">Complete task</button> -->
                     <button mat-menu-item [routerLink]="staff_member.id + '/tasks'" [state]="{staff_member: staff_member}">
                         View Tasks
                     </button>

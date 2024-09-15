@@ -233,3 +233,12 @@ class UpdateRoomStatusRequest(BaseModel):
 
 class EventNotification(BaseModel):
     info: str
+
+class RoomAssignmentConsumption(BaseModel):
+    client_current_average: float
+    client_flow_rate_average: float
+    total_current_average: float
+    total_flow_rate_average: float
+
+class CleaningUpdate(BaseModel):
+    room_id: int

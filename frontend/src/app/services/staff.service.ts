@@ -28,7 +28,11 @@ export class StaffService {
     return this.http.put(`${this.simulateApiUrl}/${staffId}/end-shift`, {});
   }
 
-  completeTask(staffId: number): Observable<any> {
-    return this.http.put(`${this.simulateApiUrl}/${staffId}/complete-task`, {});
+  startTask(staffId: number, roomId: number): Observable<any> {
+    return this.http.put(`${this.simulateApiUrl}/cleaning/${staffId}/start-task`, {room_id: roomId});
+  }
+
+  completeTask(staffId: number, roomId: number): Observable<any> {
+    return this.http.put(`${this.simulateApiUrl}/cleaning/${staffId}/complete-task`, {room_id: roomId});
   }
 }

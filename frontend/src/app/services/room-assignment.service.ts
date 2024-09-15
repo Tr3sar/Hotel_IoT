@@ -15,4 +15,8 @@ export class RoomAssignmentService {
   getRoomAssignments() : Observable<RoomAssignment[]>{
     return this.http.get<RoomAssignment[]>(this.apiUrl)
   }
+
+  getConsumption(roomAssignmentId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${roomAssignmentId}/consumption`);
+  }
 }

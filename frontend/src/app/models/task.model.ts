@@ -11,7 +11,7 @@ export interface Task {
     staff_id: number;
     room_id: number;
     task_status: TaskStatus;
-    assignedAt: string;
-    completedAt?: string;
+    assigned_at: string;
+    completed_at?: string;
     room: Room;
 }

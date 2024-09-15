@@ -46,3 +46,10 @@ def update_check_out_time(room_assignment_id: int, db: Session = Depends(get_db)
     if not room_assignment:
         raise HTTPException(status_code=404, detail="Room assignment not found")
     return room_assignment
+
+@router.get("/{room_assignment_id}/consumption", response_model=schemas.RoomAssignmentConsumption)
+def get_room_assignment_consumption(room_assignment_id: int, db: Session = Depends(get_db), storage: storage_module.Storage = Depends(get_storage)):
+    room_assignment = storage.get_room_assignment_consumption(db, room_assignment_id)
+    if not room_assignment:
+        raise HTTPException(status_code=404, detail="Room assignment not found")
+    return room_assignment

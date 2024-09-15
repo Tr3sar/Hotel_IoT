@@ -3,6 +3,7 @@ import { Router } from '@angular/router';;
 import { Task, TaskStatus } from '../../models/task.model';
 import { Staff } from '../../models/staff.model';
 import { TaskService } from '../../services/task.service';
+import { StaffService } from '../../services/staff.service';
 
 @Component({
   selector: 'app-tasks',
@@ -13,7 +14,7 @@ export class TasksComponent {
   tasks: Task[] = [];
   staff_member!: Staff;
 
-  constructor(private router: Router, private taskService: TaskService) {
+  constructor(private router: Router, private taskService: TaskService, private staffService: StaffService) {
     const navigation = this.router.getCurrentNavigation();
 
     this.staff_member = navigation?.extras.state?.['staff_member'] as Staff;
@@ -26,7 +27,7 @@ export class TasksComponent {
 
   completeTask(task: Task): void {
     const now = new Date();
-    
+
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
@@ -36,21 +37,29 @@ export class TasksComponent {
     const seconds = String(now.getSeconds()).padStart(2, '0');
 
     const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    
-    task.completedAt = formattedDateTime;
-    task.task_status = TaskStatus.Completed
 
-    this.taskService.updateTask(task).subscribe(() => {
-      this.tasks = this.tasksNotCompleted;
-    });
+    task.completed_at = formattedDateTime;
+    task.task_status = TaskStatus.Completed;
+
+    this.staffService.completeTask(this.staff_member.id, task.room_id).subscribe(
+      () => {
+        this.taskService.updateTask(task).subscribe(() => {
+          this.tasks = this.tasksNotCompleted;
+        });
+      }
+    );
   }
 
   startTask(task: Task): void {
     task.task_status = TaskStatus.InProgress;
 
-    this.taskService.updateTask(task).subscribe(() => {
-      this.tasks = this.tasksNotCompleted;
-    });
+    this.staffService.startTask(this.staff_member.id, task.room_id).subscribe(
+      () => {
+        this.taskService.updateTask(task).subscribe(() => {
+          this.tasks = this.tasksNotCompleted;
+        });
+      }
+    );
   }
 
 }

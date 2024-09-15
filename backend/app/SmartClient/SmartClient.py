@@ -13,6 +13,9 @@ class SmartClient():
         self.email = email
         self.rfid_code = None
         self.room_number = None
+        
+        self.current_sum = 0
+        self.flow_rate_sum = 0
 
         self.notifier = SmartClientNotifier(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
         self.subscriber = SmartClientSubscriber(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
@@ -31,6 +34,12 @@ class SmartClient():
 
     def getRoom(self):
         return self.room_number
+    
+    def getCurrentSum(self):
+        return self.current_sum
+    
+    def getFlowRateSum(self):
+        return self.flow_rate_sum
 
     def setRfidCode(self, rfid_code):
         if self.rfid_code:
@@ -42,6 +51,12 @@ class SmartClient():
 
     def setLastName(self, last_name):
         self.last_name = last_name
+    
+    def addCurrent(self, current):
+        self.current_sum += current
+    
+    def addFlowRate(self, flow_rate):
+        self.flow_rate_sum += flow_rate
     
     def setRoom(self, room_number):
         if self.room_number:
@@ -69,10 +84,10 @@ class SmartClient():
             raise Exception(f"Client {self.client_id} is not checked in to any room")
         self.notifier.notify_adjust_environment(self.room_number, temperature, lighting_intensity)
         
-    def requestRoomCleaning(self):
+    def requestRoomCleaning(self, room_id):
         if not self.room_number:
             raise Exception(f"Client {self.client_id} is not checked in to any room")
-        self.notifier.notify_cleaning_request(self.room_number)
+        self.notifier.notify_cleaning_request(self.room_number, room_id)
 
     def make_reservation(self, type, start_Date):
         self.notifier.notify_reservation(self.client_id, type, start_Date)

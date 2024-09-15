@@ -12,6 +12,7 @@ export class TaskService {
   constructor(private http: HttpClient) { }
 
   updateTask(task: Task): Observable<Task> {
+    console.table(task);
     return this.http.put<Task>(`${this.apiUrl}/${task.id}`, task);
   }
 }

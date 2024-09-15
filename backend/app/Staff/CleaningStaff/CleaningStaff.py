@@ -52,18 +52,15 @@ class CleaningStaff:
         response = requests.put(url, headers=headers, json=put_payload)
 
     def assign_task(self, room_number):
-        if self.working:
-            self.current_tasks.append(room_number)
-        else:
-            print(f"Staff {self.staff_id} is not working currently.")
-
-    def complete_task(self):
-        if self.current_tasks:
-            room_number = self.current_tasks.pop(0)
+        self.current_tasks.append(room_number)
+    
+    def start_task(self, room_number):
+        if self.current_tasks and room_number in self.current_tasks:
             self.notifier.notify_task_started(room_number)
+
+    def complete_task(self, room_number):
+        if self.current_tasks and room_number in self.current_tasks:
+
+            self.notifier.notify_task_completed(room_number)
+            self.current_tasks.remove(room_number)
             
-            def finish_cleaning():
-                time.sleep(5)
-                self.notifier.notify_task_completed(room_number)
-            
-            threading.Thread(target=finish_cleaning).start()

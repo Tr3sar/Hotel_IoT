@@ -30,7 +30,7 @@ class WaterFlowSensorNotifier:
     def on_publish(self, client, userdata, mid, properties=None):
         logger.info(f"Message published with ID: {mid}")
 
-    def notify_flow_rate(self, room_id, flow_rate):
-        payload = {"room_id": room_id, "type": "water", "flow_rate": flow_rate}
-        self.client.publish(f"hotel/rooms/{room_id}/consumption", json.dumps(payload))
-        logger.info(f"Flow rate notification sent for room {room_id} with flow rate {flow_rate}")
+    def notify_flow_rate(self, room_number, flow_rate):
+        payload = {"room_id": room_number, "type": "water", "flow_rate": flow_rate}
+        self.client.publish(f"hotel/rooms/{room_number}/consumption", json.dumps(payload))
+        logger.info(f"Flow rate notification sent for room {room_number} with flow rate {flow_rate}")

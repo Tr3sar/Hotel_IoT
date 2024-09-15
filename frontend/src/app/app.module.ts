@@ -28,6 +28,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { StaffComponent } from './pages/staff/staff.component';
 import { TasksComponent } from './pages/tasks/tasks.component';
 import { NotifyDialogComponent } from './components/dialog/notify-dialog/notify-dialog.component';
+import { CheckoutDialogComponent } from './components/dialog/checkout-dialog/checkout-dialog.component';
 
 
 
@@ -43,6 +44,7 @@ import { NotifyDialogComponent } from './components/dialog/notify-dialog/notify-
     StaffComponent,
     TasksComponent,
     NotifyDialogComponent,
+    CheckoutDialogComponent,
   ],
   imports: [
     BrowserModule,

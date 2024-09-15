@@ -53,12 +53,17 @@ class SmartClientSubscriber:
     def handle_events_info(self, data):
         event_info = data["event"]
         logger.info(f"Received event info: {event_info}")
-        self._debug(f"(SmartClient: {self.smartClient.getClientId()})Received events info: {data}")
     
     def handle_room_status(self, data):
         status = data["status"]
         #self._debug(f"Received room status: {data}")
     
     def handle_consumption(self, data):
-        consumption = data["consumption"]
-        #self._debug(f"Received consumption: {data}")
+        type = data["type"]
+
+        if type == "electricity":
+            current = data["current"]
+            self.smartClient.addCurrent(current)
+        elif type == "water":
+            flow_rate = data["flow_rate"]
+            self.smartClient.addFlowRate(flow_rate)

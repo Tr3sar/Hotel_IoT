@@ -25,11 +25,14 @@ class SmartRoom():
         self.ac = AC(self.number)
         self.bulb = Bulb(self.number)
 
-        #self.electricity_consumption_sensor = ElectricityConsumptionSensor(self.number)
-        #self.water_flow_sensor = WaterFlowSensor(self.number)
+        self.electricity_consumption_sensor = ElectricityConsumptionSensor(self.number)
+        self.water_flow_sensor = WaterFlowSensor(self.number)
         self.smoke_sensor = SmokeSensor(self.number)
 
         self.subscriber = SmartRoomSubscriber(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
+    
+    def get_id(self):
+        return self.id
     
     def get_number(self):
         return self.number
@@ -76,9 +79,6 @@ class SmartRoom():
             check_in_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
             expense = float(0)
 
-            print('check_in_date', check_in_date)
-            print('expense', expense)
-
             url = os.getenv("API_URL") + f"/room_assignments"
             post_payload = {
                 "client_id": client_id,
@@ -93,10 +93,8 @@ class SmartRoom():
             "Accept-Language": "es",
             }
 
-            print('Payload:', post_payload)
             response = requests.post(url, headers=headers, json=post_payload)
 
-            print(response.status_code)
             if response.status_code == 200:
                 self.assignment_id = response.json().get("id")
             else:
@@ -134,5 +132,3 @@ class SmartRoom():
             "Accept-Language": "es",
             }
             response = requests.put(url, headers=headers, data=put_payload)
-        else:
-            print("Invalid room status")

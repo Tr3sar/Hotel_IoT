@@ -11,6 +11,7 @@ import { ReservationDialogComponent } from '../../components/dialog/reservation-
 import { OrderRestaurantDialogComponent } from '../../components/dialog/order-restaurant/order-restaurant-dialog.component';
 import { AdjustEnvironmentDialogComponent } from '../../components/dialog/adjust-environment/adjust-environment-dialog.component';
 import { switchMap } from 'rxjs';
+import { CheckoutDialogComponent } from '../../components/dialog/checkout-dialog/checkout-dialog.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -76,15 +77,6 @@ export class DashboardComponent implements OnInit {
     );
   }
 
-  checkout(client_id: number): void {
-    let room_id = this.roomAssignments.find((roomAssignment: RoomAssignment) => roomAssignment.client_id === client_id)!.room_id;
-    let room_number = this.rooms.find((room: Room) => room.id === room_id)!.number;
-    let rfid_code = this.roomAssignments.find((roomAssignment: RoomAssignment) => roomAssignment.client_id === client_id)!.rfid_code;
-
-    this.roomAssignments = this.roomAssignments.filter((roomAssignment: RoomAssignment) => roomAssignment.client_id !== client_id);
-    this.clientService.checkoutClient(client_id, room_number, rfid_code).subscribe();
-  }
-
   requestCleaning(clientId: number, roomNumber: number): void {
     this.clientService.cleaningRequest(clientId, roomNumber).subscribe();
   }
@@ -117,6 +109,25 @@ export class DashboardComponent implements OnInit {
           const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
           let roomAssignment = {'client_id': result.client_id, 'room_id': roomId, 'rfid_code': result.rfid_code, 'expense': 0, 'check_in_date': formattedDateTime, 'check_out_date': null, id: lastAssignmentId + 1 || 1}
           this.roomAssignments.push(roomAssignment);
+        });
+        break;
+      
+      case 'checkout':
+        let client_id = data.client_id;
+        let roomAssignmentId = this.roomAssignments.find((roomAssignment: RoomAssignment) => (roomAssignment.client_id === client_id) && (roomAssignment.check_out_date == null))!.id;
+        let room_id = this.roomAssignments.find((roomAssignment: RoomAssignment) => roomAssignment.client_id === client_id)!.room_id;
+        let room_number = this.rooms.find((room: Room) => room.id === room_id)!.number;
+        let rfid_code = this.roomAssignments.find((roomAssignment: RoomAssignment) => roomAssignment.client_id === client_id)!.rfid_code;
+
+        dialogRef = this.dialog.open(CheckoutDialogComponent, {
+          data: {roomAssignmentId, client_id, room_number, rfid_code}
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+          console.table(result);
+          if (result) {
+            this.roomAssignments = this.roomAssignments.filter((roomAssignment: RoomAssignment) => roomAssignment.client_id !== client_id);
+          }
         });
         break;
 

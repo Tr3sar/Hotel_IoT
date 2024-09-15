@@ -47,8 +47,8 @@ class SmartClientNotifier:
         self.client.publish(f"hotel/rooms/{room_number}/environment", json.dumps(payload))
         logger.info(f"Environment adjustment notification sent for room {room_number} with temperature {temperature} and lightning intensity {lightning_intensity}")
 
-    def notify_cleaning_request(self, room_number):
-        payload = {"room_number": room_number, "status": RoomStatus.CLEAN_REQUIRED.value}
+    def notify_cleaning_request(self, room_number, room_id):
+        payload = {"room_number": room_number, "status": RoomStatus.CLEAN_REQUIRED.value, "room_id": room_id}
         self.client.publish(f"hotel/rooms/{room_number}/status", json.dumps(payload))
         logger.info(f"Cleaning request notification sent for room {room_number}")
         

@@ -82,6 +82,14 @@ class Storage:
                 self.staff[staff_member.id] = SecurityStaff(staff_member.id, staff_member.name, staff_member.working)
             if staff_member.working:
                 self.staff[staff_member.id].start_shift()
+        
+        tasks = db.query(models.Task).all()
+        for task in tasks:
+            staff_member = self.staff.get(task.staff_id)
+            room_number = self.rooms[task.room_id].number
+
+            staff_member.assign_task(room_number)
+
         #Revisar
         reservations = db.query(models.Reservation).all()
         for reservation in reservations:
@@ -420,6 +428,44 @@ class Storage:
         db.refresh(room_assignment)
         
         return room_assignment
+
+    def get_room_assignment_consumption(self, db: Session, room_assignment_id: int):
+        room_assignment = db.query(models.RoomAssignment).filter(models.RoomAssignment.id == room_assignment_id).first()
+        if not room_assignment:
+            return None
+        
+        client_electricity_consumptions = db.query(models.ElectricityConsumption).filter(models.ElectricityConsumption.room_assignment_id == room_assignment_id).all()
+        client_water_consumptions = db.query(models.WaterConsumption).filter(models.WaterConsumption.room_assignment_id == room_assignment_id).all()
+
+        electricity_consumptions = db.query(models.ElectricityConsumption).all()
+        water_consumptions = db.query(models.WaterConsumption).all()
+
+        if len(electricity_consumptions) == 0: 
+            total_current_average = 0.0
+        else:
+            total_current_average = sum([c.consumption for c in electricity_consumptions]) / len(electricity_consumptions)
+
+        if len(water_consumptions) == 0:
+            total_flow_rate_average = 0.0
+        else:
+            total_flow_rate_average = sum([c.consumption for c in water_consumptions]) / len(water_consumptions)
+
+        if len(client_electricity_consumptions) == 0:
+            client_current_average = 0.0
+        else:
+            client_current_average = sum([c.consumption for c in client_electricity_consumptions]) / len(client_electricity_consumptions)
+
+        if len(client_water_consumptions) == 0:
+            client_flow_rate_average = 0.0
+        else:
+            client_flow_rate_average = sum([c.consumption for c in client_water_consumptions]) / len(client_water_consumptions)
+        
+        return {
+            "client_current_average": client_current_average,
+            "client_flow_rate_average": client_flow_rate_average,
+            "total_current_average": total_current_average,
+            "total_flow_rate_average": total_flow_rate_average
+        }
     
     #Client
     def get_client(self, client_id: int):
@@ -484,8 +530,16 @@ class Storage:
             raise ValueError("Client not found")
         elif smart_client.getRoom() is None:
             raise ValueError("Client is not checked in")
-                    
-        smart_client.requestRoomCleaning()
+        
+        room_id = None
+        for room_assignment in self.rooms.values():
+            if room_assignment.occupied_by == client_id:
+                room_id = room_assignment.get_id()
+                break
+        
+        if room_id is None:
+            raise ValueError("Room not found")
+        smart_client.requestRoomCleaning(room_id)
         return {'message': 'Cleaning requested successfully'}
  
     def order_restaurant(self, client_id: int, order_details: str):
@@ -569,13 +623,22 @@ class Storage:
         
         staff_member.end_shift()
         return {"id": staff_id, "name": staff_member.name, "working": staff_member.working}
-        
-    def complete_task(self, staff_id: int):
+
+    def start_task(self, staff_id: int, room_id: int):
         staff_member = self.staff.get(staff_id)
         if not staff_member:
             raise HTTPException(status_code=404, detail="Cleaning staff not found")
         
-        staff_member.complete_task()
+        staff_member.start_task(self.rooms[room_id].number)
+        return {"id": staff_id, "name": staff_member.name, "working": staff_member.working}
+
+    def complete_task(self, staff_id: int, room_id: int):
+        staff_member = self.staff.get(staff_id)
+        if not staff_member:
+            raise HTTPException(status_code=404, detail="Cleaning staff not found")
+        
+        staff_member.complete_task(self.rooms[room_id].number)
+        
         return {"id": staff_id, "name": staff_member.name, "working": staff_member.working}
 
     #Task
@@ -638,10 +701,8 @@ class Storage:
             if not smart_client:
                 raise HTTPException(status_code=404, detail="Client not found")
             
-            print('creating reservation')
-            
             db_reservation = models.Reservation(client_id=reservation.client_id, type=reservation.type, start_date=reservation.start_date, end_date=reservation.end_date, status=reservation.status, payment_status=reservation.payment_status, total_cost=reservation.total_cost, special_request=reservation.special_request)
-            print('reservation created')
+
             db.add(db_reservation)
             db.commit()
             db.refresh(db_reservation)

@@ -13,8 +13,8 @@
             </div>   
             
             <mat-menu #menuTasks="matMenu">
-                <button mat-menu-item (click)="startTask(task)">Start  task</button>
-                <button mat-menu-item (click)="completeTask(task)">Complete task</button>
+                <button mat-menu-item (click)="startTask(task)" *ngIf="task.task_status == 'pending'">Start  task</button>
+                <button mat-menu-item (click)="completeTask(task)" *ngIf="task.task_status == 'in_progress'">Complete task</button>
             </mat-menu>
         </div>
     </div>

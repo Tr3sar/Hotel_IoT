@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { StaffService } from '../../services/cleaning-staff.service';
+import { StaffService } from '../../services/staff.service';
 import { Staff } from '../../models/staff.model';
 
 @Component({
@@ -42,11 +42,6 @@ export class StaffComponent {
   endShift(staff: Staff) {
     this.staffService.endShift(staff.id).subscribe(() => {
       staff.working = false;
-    });
-  }
-
-  completeTask(staff: Staff) {
-    this.staffService.completeTask(staff.id).subscribe(() => {
     });
   }
 }

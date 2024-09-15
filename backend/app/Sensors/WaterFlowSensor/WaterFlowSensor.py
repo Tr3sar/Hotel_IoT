@@ -9,8 +9,8 @@ load_dotenv()
 
 class WaterFlowSensor():
     #Sensor YF-S201
-    def __init__(self, room_id):
-        self.sensor_id = room_id
+    def __init__(self, room_number):
+        self.sensor_id = room_number
         self.flow_rate = 0
         self.flow_rate_sum = 0
 

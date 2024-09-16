@@ -42,8 +42,8 @@ class SmartHotelNotifier:
 
     def notify_clean_required(self, staff_id, room_number):
         payload = {"staff_id": staff_id, "room_number": room_number, "status": "CLEAN_REQUIRED"}
-        self.client.publish(f"hotel/staff/cleanliness/{staff_id}/tasks", json.dumps(payload))
         logger.info(f"Room {room_number} assigned to staff {staff_id} for cleaning")
+        self.client.publish(f"hotel/staff/cleanliness/{staff_id}/tasks", json.dumps(payload))
 
     def notify_smoke_alarm(self, room_number, staff_id, smoke_level):
         payload = {"room_number": room_number, "smoke_level": smoke_level}

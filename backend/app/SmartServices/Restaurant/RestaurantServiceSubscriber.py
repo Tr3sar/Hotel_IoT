@@ -40,10 +40,11 @@ class RestaurantServiceSubscriber:
         
         client_id = data["client_id"]
         start_date = data["start_date"]
+        special_request = data["special_request"]
         
-        logger.info(f"New restaurant reservation: Client {client_id} at {start_date}")
+        logger.info(f"New restaurant reservation: Client {client_id} at {start_date} with special request: {special_request}")
 
-        self.restaurant.make_reservation(client_id, start_date)
+        self.restaurant.make_reservation(client_id, start_date, special_request)
     
     def handle_order(self, data):
         client_id = data["client_id"]

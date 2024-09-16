@@ -93,7 +93,7 @@ class Storage:
         #Revisar
         reservations = db.query(models.Reservation).all()
         for reservation in reservations:
-            self.clients[reservation.client_id].make_reservation(reservation.type, reservation.start_date)
+            self.clients[reservation.client_id].make_reservation(reservation.type, reservation.start_date, reservation.special_request)
 
     def populate_db(self, db: Session):
         fake = Faker('es_ES')
@@ -552,7 +552,7 @@ class Storage:
         smart_client = self.clients.get(client_id)
         if not smart_client:
             raise ValueError("Client not found")
-        smart_client.make_reservation(reservation.type, reservation.start_date)
+        smart_client.make_reservation(reservation.type, reservation.start_date, reservation.special_request)
 
     #Staff
     

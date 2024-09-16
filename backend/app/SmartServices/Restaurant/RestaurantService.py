@@ -12,7 +12,7 @@ class RestaurantService:
         self.reservations = []
         self.subscriber = RestaurantServiceSubscriber(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
 
-    def make_reservation(self, client_id, time):
+    def make_reservation(self, client_id, time, special_request):
         exists, reservation_data = self.check_reservation_exists(client_id, time)
 
         if exists:
@@ -29,7 +29,8 @@ class RestaurantService:
                 "end_date": end_date.isoformat(),
                 "status": "confirmed",
                 "payment_status": "pending",
-                "total_cost": 0
+                "total_cost": 0,
+                "special_request": special_request
             }
 
             headers = {

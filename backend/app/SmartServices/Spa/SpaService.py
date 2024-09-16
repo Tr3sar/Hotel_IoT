@@ -3,6 +3,7 @@ from app.SmartServices.Spa.SpaServiceSubscriber import SpaServiceSubscriber
 import requests
 import os
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 
 load_dotenv()
 
@@ -11,18 +12,27 @@ class SpaService:
         self.appointments = []
         self.subscriber = SpaServiceSubscriber(self, os.getenv("BROKER_URL"), int(os.getenv("BROKER_PORT")))
 
-    def book_appointment(self, client_id, time):
+    def book_appointment(self, client_id, time, special_request):
         exists, appointment_data = self.check_appointment_exists(client_id, time)
 
         if exists:
             self.appointments.append(appointment_data)
         else:
             url = os.getenv("API_URL") + f"/reservations"
+            start_date = datetime.fromisoformat(time)
+            end_date = start_date + timedelta(hours=2)
+            
             post_payload = {
                 "client_id": client_id,
                 "type": "spa",
-                "start_date": time,
+                "start_date": start_date.isoformat(),
+                "end_date": end_date.isoformat(),
+                "status": "confirmed",
+                "payment_status": "pending",
+                "total_cost": 0,
+                "special_request": special_request
             }
+
             headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",

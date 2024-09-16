@@ -89,8 +89,8 @@ class SmartClient():
             raise Exception(f"Client {self.client_id} is not checked in to any room")
         self.notifier.notify_cleaning_request(self.room_number, room_id)
 
-    def make_reservation(self, type, start_Date):
-        self.notifier.notify_reservation(self.client_id, type, start_Date)
+    def make_reservation(self, type, start_date, special_request):
+        self.notifier.notify_reservation(self.client_id, type, start_date, special_request)
     
     def order_restaurant(self, order_details):
         self.notifier.notify_order(self.client_id, order_details)

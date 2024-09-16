@@ -35,6 +35,7 @@ class SpaServiceSubscriber:
         
         client_id = data["client_id"]
         start_date = data["start_date"]
+        special_request = data["special_request"]
         
-        logger.info(f"New reservation: Client {client_id} at {start_date}")
-        self.spa.book_appointment(client_id, start_date)
+        logger.info(f"New reservation: Client {client_id} at {start_date} with special request: {special_request}")
+        self.spa.book_appointment(client_id, start_date, special_request)

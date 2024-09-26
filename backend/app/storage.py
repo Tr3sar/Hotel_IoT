@@ -51,8 +51,14 @@ class Storage:
         try:
             timestamp = datetime.now()
             for room in self.rooms.values():
-                self.record_light_consumption(db, room.get_number(), room.occupied_by, room.electricity_consumption_sensor.get_consumption_data(), timestamp)
-                self.record_water_consumption(db, room.get_number(), room.occupied_by, room.water_flow_sensor.get_flow_rate_sum(), timestamp)
+                if room.occupied_by is None:
+                    continue
+
+                if room.electricity_consumption_sensor.get_consumption_data() > 0:
+                    self.record_light_consumption(db, room.get_number(), room.occupied_by, room.electricity_consumption_sensor.get_consumption_data(), timestamp)
+                
+                if room.water_flow_sensor.get_flow_rate_sum() > 0:
+                    self.record_water_consumption(db, room.get_number(), room.occupied_by, room.water_flow_sensor.get_flow_rate_sum(), timestamp)
 
                 room.electricity_consumption_sensor.clear_consumption_data()
                 room.water_flow_sensor.clear_flow_rate_sum()
@@ -261,14 +267,48 @@ class Storage:
 
     #Sensor
     def record_light_consumption(self, db: Session, room_number: int, client_id: int, consumption: float, timestamp: datetime):
-        db_consumption = models.ElectricityConsumption(room_number=room_number, client_id=client_id, consumption=consumption, timestamp=timestamp)
+        room = db.query(models.Room).filter(models.Room.number == room_number).first()
+        if not room:
+            raise HTTPException(status_code=404, detail="Room not found")
+
+        room_assignment = db.query(models.RoomAssignment).filter(
+            models.RoomAssignment.room_id == room.id,
+            models.RoomAssignment.client_id == client_id,
+            models.RoomAssignment.check_out_date.is_(None)
+        ).first()
+
+        if not room_assignment:
+            raise HTTPException(status_code=404, detail="Active room assignment not found")
+
+        db_consumption = models.ElectricityConsumption(
+            room_assignment_id=room_assignment.id,
+            consumption=consumption,
+            timestamp=timestamp
+        )
         db.add(db_consumption)
         db.commit()
         db.refresh(db_consumption)
         return db_consumption
 
     def record_water_consumption(self, db: Session, room_number: int, client_id: int, consumption: float, timestamp: datetime):
-        db_consumption = models.WaterConsumption(room_number=room_number, client_id=client_id, consumption=consumption, timestamp=timestamp)
+        room = db.query(models.Room).filter(models.Room.number == room_number).first()
+        if not room:
+            raise HTTPException(status_code=404, detail="Room not found")
+
+        room_assignment = db.query(models.RoomAssignment).filter(
+            models.RoomAssignment.room_id == room.id,
+            models.RoomAssignment.client_id == client_id,
+            models.RoomAssignment.check_out_date.is_(None)
+        ).first()
+
+        if not room_assignment:
+            raise HTTPException(status_code=404, detail="Active room assignment not found")
+
+        db_consumption = models.WaterConsumption(
+            room_assignment_id=room_assignment.id,
+            consumption=consumption,
+            timestamp=timestamp
+        )
         db.add(db_consumption)
         db.commit()
         db.refresh(db_consumption)

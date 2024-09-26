@@ -101,8 +101,8 @@ class SmartRoom():
                 response.raise_for_status()
 
         self.occupied_by = client_id
-        #self.electricity_consumption_sensor.set_tracking_consumption(True)
-        #self.water_flow_sensor.set_tracking_consumption(True)
+        self.electricity_consumption_sensor.set_tracking_consumption(True)
+        self.water_flow_sensor.set_tracking_consumption(True)
 
     def vacate(self, client_id):
         if self.occupied_by == client_id and self.assignment_id is not None:
@@ -117,8 +117,8 @@ class SmartRoom():
 
             self.occupied_by = None
             self.assignment_id = None
-            #self.electricity_consumption_sensor.set_tracking_consumption(False)
-            #self.water_flow_sensor.set_tracking_consumption(False)
+            self.electricity_consumption_sensor.set_tracking_consumption(False)
+            self.water_flow_sensor.set_tracking_consumption(False)
     
     def setRoomStatus(self, status):
         if status in [status.value for status in RoomStatus]:

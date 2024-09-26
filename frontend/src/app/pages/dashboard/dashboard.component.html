@@ -44,7 +44,7 @@
                     <button mat-menu-item (click)="openDialog('checkout', {'client_id': client.id})">Check-out</button>
                     <button mat-menu-item (click)="requestCleaning(client.id, getRoomByClientId(client.id)!.number)">Request cleaning</button>
                     <button mat-menu-item (click)="openDialog('reservation', {'client_id': client.id})">Make reservation</button>
-                    <button mat-menu-item (click)="openDialog('order_restaurant', {'client_id': client.id})">Order restaurant</button>
+                    <!-- <button mat-menu-item (click)="openDialog('order_restaurant', {'client_id': client.id})">Order restaurant</button> -->
                 </mat-menu>
             </div>
         </div>
